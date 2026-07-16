@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<head><title>Events List</title></head>
+<body>
+    <h1>All Events</h1>
+    <ul>
+        {% for event in events %}
+            <li>{{ event.name }} - {{ event.date }} - Budget: {{ event.budget_allocated }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

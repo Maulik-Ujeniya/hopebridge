@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<head><title>Programs List</title></head>
+<body>
+    <h1>All Programs</h1>
+    <ul>
+        {% for program in programs %}
+            <li>{{ program.name }} - {{ program.program_type }} - Starts: {{ program.start_date }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
