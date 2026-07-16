@@ -13,6 +13,8 @@
 <p>Email: {{ donor.email }}</p>
 <p>Phone: {{ donor.phone }}</p>
 <p>Total Donated: ₹{{ donor.total_donated }}</p>
+<a href="/donors/{{ donor.id }}/edit/" class="btn btn-warning btn-sm">Edit</a>
+<a href="/donors/{{ donor.id }}/delete/" class="btn btn-danger btn-sm">Delete</a>
 
 <h3>Donation History</h3>
 <table class="table table-striped">

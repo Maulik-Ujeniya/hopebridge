@@ -21,3 +21,22 @@ def donor_create(request):
     else:
         form = DonorForm()
     return render(request, 'donors/donor_form.html', {'form': form})
+
+
+def donor_edit(request, donor_id):
+    donor = get_object_or_404(Donor, id=donor_id)
+    if request.method == 'POST':
+        form = DonorForm(request.POST, instance=donor)
+        if form.is_valid():
+            form.save()
+            return redirect('donor_detail', donor_id=donor.id)
+    else:
+        form = DonorForm(instance=donor)
+    return render(request, 'donors/donor_form.html', {'form': form})
+
+def donor_delete(request, donor_id):
+    donor = get_object_or_404(Donor, id=donor_id)
+    if request.method == 'POST':
+        donor.delete()
+        return redirect('donor_list')
+    return render(request, 'donors/donor_confirm_delete.html', {'donor': donor})
