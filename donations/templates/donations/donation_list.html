@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>All Donations</h1>
+<table class="table table-striped">
+    <thead>
+        <tr><th>Donor</th><th>Type</th><th>Amount</th><th>Quantity</th><th>Date</th></tr>
+    </thead>
+    <tbody>
+        {% for donation in donations %}
+        <tr>
+            <td><a href="/donations/{{ donation.id }}/">{{ donation.donor.name }}</a></td>
+            <td>{{ donation.donation_type }}</td>
+            <td>{{ donation.amount|default:"-" }}</td>
+            <td>{{ donation.quantity|default:"-" }}</td>
+            <td>{{ donation.date_donated }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

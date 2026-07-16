@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Donation Details</h1>
+<p>Donor: <a href="/donors/{{ donation.donor.id }}/">{{ donation.donor.name }}</a></p>
+<p>Type: {{ donation.donation_type }}</p>
+<p>Amount: ₹{{ donation.amount|default:"-" }}</p>
+<p>Quantity: {{ donation.quantity|default:"-" }}</p>
+<p>Date Donated: {{ donation.date_donated }}</p>
+{% endblock %}
