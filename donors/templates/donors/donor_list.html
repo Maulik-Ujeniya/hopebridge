@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <title>Donors List</title>
+</head>
+<body>
+    <h1> All Donors </h1>
+    <ul>
+        {% for donor in donors %}
+                    <li>{{ donor.name }} - {{ donor.email }} - {{ donor.total_donated }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+
