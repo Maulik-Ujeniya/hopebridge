@@ -1,6 +1,6 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import render, get_object_or_404, redirect
 from .models import Donor
-
+from .forms import DonorForm
 # Create your views here.
 
 def donor_list(request):
@@ -12,3 +12,12 @@ def donor_detail(request, donor_id):
     donations = donor.donation_set.all()
     return render(request, 'donors/donor_detail.html', {'donor': donor, 'donations': donations})
 
+def donor_create(request):
+    if request.method == 'POST':
+        form = DonorForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('donor_list')
+    else:
+        form = DonorForm()
+    return render(request, 'donors/donor_form.html', {'form': form})
