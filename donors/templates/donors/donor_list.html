@@ -16,7 +16,7 @@
     <tbody>
         {% for donor in donors %}
         <tr>
-            <td>{{ donor.name }}</td>
+            <td><a href="/donors/{{ donor.id }}/">{{ donor.name }}</a></td>
             <td>{{ donor.email }}</td>
             <td>₹{{ donor.total_donated }}</td>
         </tr>
