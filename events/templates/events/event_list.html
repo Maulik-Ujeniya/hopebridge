@@ -1,8 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head><title>Events List</title></head>
-<body>
-    {% extends 'base.html' %}
+{% extends 'base.html' %}
 
 {% block content %}
 <h1>All Events</h1>
@@ -13,7 +9,7 @@
     <tbody>
         {% for event in events %}
         <tr>
-            <td>{{ event.name }}</td>
+            <td><a href="/events/{{ event.id }}/">{{ event.name }}</a></td>
             <td>{{ event.date }}</td>
             <td>₹{{ event.budget_allocated }}</td>
         </tr>
@@ -21,5 +17,3 @@
     </tbody>
 </table>
 {% endblock %}
-</body>
-</html>

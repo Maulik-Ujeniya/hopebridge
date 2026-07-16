@@ -9,7 +9,7 @@ class Event(models.Model):
     date = models.DateField()
     budget_allocated = models.DecimalField(max_digits=10,decimal_places=2,default=0)
     budget_used = models.DecimalField(max_digits=10,decimal_places=2,default=0)
-    Volunteers = models.ManyToManyField(Volunteer,blank=True) 
+    volunteers = models.ManyToManyField(Volunteer, blank=True) 
 
     def __str__(self):
         return self.name
