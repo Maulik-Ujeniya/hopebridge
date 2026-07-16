@@ -19,3 +19,21 @@ def donation_create(request):
     else:
         form = DonationForm()
     return render(request, 'donations/donation_form.html', {'form': form})
+
+def donation_edit(request, donation_id):
+    donation = get_object_or_404(Donation, id=donation_id)
+    if request.method == 'POST':
+        form = DonationForm(request.POST, instance=donation)
+        if form.is_valid():
+            form.save()
+            return redirect('donation_detail', donation_id=donation.id)
+    else:
+        form = DonationForm(instance=donation)
+    return render(request, 'donations/donation_form.html', {'form': form})
+
+def donation_delete(request, donation_id):
+    donation = get_object_or_404(Donation, id=donation_id)
+    if request.method == 'POST':
+        donation.delete()
+        return redirect('donation_list')
+    return render(request, 'donations/donation_confirm_delete.html', {'donation': donation})

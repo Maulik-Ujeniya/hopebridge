@@ -7,4 +7,6 @@
 <p>Start Date: {{ program.start_date }}</p>
 <p>End Date: {{ program.end_date|default:"Ongoing" }}</p>
 <p>Sponsor: {{ program.sponsor.name|default:"No sponsor assigned" }}</p>
+<a href="/programs/{{ program.id }}/edit/" class="btn btn-warning btn-sm">Edit</a>
+<a href="/programs/{{ program.id }}/delete/" class="btn btn-danger btn-sm">Delete</a>
 {% endblock %}

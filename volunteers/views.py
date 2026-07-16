@@ -20,3 +20,21 @@ def volunteer_create(request):
     else:
         form = VolunteerForm()
     return render(request, 'volunteers/volunteer_form.html', {'form': form})
+
+def volunteer_edit(request, volunteer_id):
+    volunteer = get_object_or_404(Volunteer, id=volunteer_id)
+    if request.method == 'POST':
+        form = VolunteerForm(request.POST, instance=volunteer)
+        if form.is_valid():
+            form.save()
+            return redirect('volunteer_detail', volunteer_id=volunteer.id)
+    else:
+        form = VolunteerForm(instance=volunteer)
+    return render(request, 'volunteers/volunteer_form.html', {'form': form})
+
+def volunteer_delete(request, volunteer_id):
+    volunteer = get_object_or_404(Volunteer, id=volunteer_id)
+    if request.method == 'POST':
+        volunteer.delete()
+        return redirect('volunteer_list')
+    return render(request, 'volunteers/volunteer_confirm_delete.html', {'volunteer': volunteer})

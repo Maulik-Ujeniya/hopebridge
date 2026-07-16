@@ -5,6 +5,8 @@
 <p>Email: {{ volunteer.email }}</p>
 <p>Phone: {{ volunteer.phone }}</p>
 <p>Hours Contributed: {{ volunteer.hours_contributed }}</p>
+<a href="/volunteers/{{ volunteer.id }}/edit/" class="btn btn-warning btn-sm">Edit</a>
+<a href="/volunteers/{{ volunteer.id }}/delete/" class="btn btn-danger btn-sm">Delete</a>
 
 <h3>Events Participated</h3>
 <ul>

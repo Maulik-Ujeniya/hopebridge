@@ -6,6 +6,8 @@
 <p>Date: {{ event.date }}</p>
 <p>Budget Allocated: ₹{{ event.budget_allocated }}</p>
 <p>Budget Used: ₹{{ event.budget_used }}</p>
+<a href="/events/{{ event.id }}/edit/" class="btn btn-warning btn-sm">Edit</a>
+<a href="/events/{{ event.id }}/delete/" class="btn btn-danger btn-sm">Delete</a>
 
 <h3>Assigned Volunteers</h3>
 <ul>
