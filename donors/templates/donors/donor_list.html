@@ -5,12 +5,25 @@
     <title>Donors List</title>
 </head>
 <body>
-    <h1> All Donors </h1>
-    <ul>
+   {% extends 'base.html' %}
+
+{% block content %}
+<h1>All Donors</h1>
+<table class="table table-striped">
+    <thead>
+        <tr><th>Name</th><th>Email</th><th>Total Donated</th></tr>
+    </thead>
+    <tbody>
         {% for donor in donors %}
-                    <li>{{ donor.name }} - {{ donor.email }} - {{ donor.total_donated }}</li>
+        <tr>
+            <td>{{ donor.name }}</td>
+            <td>{{ donor.email }}</td>
+            <td>₹{{ donor.total_donated }}</td>
+        </tr>
         {% endfor %}
-    </ul>
+    </tbody>
+</table>
+{% endblock %}
 </body>
 </html>
 
