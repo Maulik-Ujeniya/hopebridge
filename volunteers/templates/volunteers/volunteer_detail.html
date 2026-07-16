@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{{ volunteer.name }}</h1>
+<p>Email: {{ volunteer.email }}</p>
+<p>Phone: {{ volunteer.phone }}</p>
+<p>Hours Contributed: {{ volunteer.hours_contributed }}</p>
+
+<h3>Events Participated</h3>
+<ul>
+    {% for event in events %}
+        <li>{{ event.name }} - {{ event.date }}</li>
+    {% empty %}
+        <li>No events assigned yet.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

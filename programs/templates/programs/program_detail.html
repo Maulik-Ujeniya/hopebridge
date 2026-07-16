@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{{ program.name }}</h1>
+<p>Type: {{ program.program_type }}</p>
+<p>{{ program.description }}</p>
+<p>Start Date: {{ program.start_date }}</p>
+<p>End Date: {{ program.end_date|default:"Ongoing" }}</p>
+<p>Sponsor: {{ program.sponsor.name|default:"No sponsor assigned" }}</p>
+{% endblock %}

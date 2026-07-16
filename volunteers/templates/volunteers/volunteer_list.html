@@ -13,7 +13,7 @@
     <tbody>
         {% for volunteer in volunteers %}
         <tr>
-            <td>{{ volunteer.name }}</td>
+            <td><a href="/volunteers/{{ volunteer.id }}/">{{ volunteer.name }}</a></td>
             <td>{{ volunteer.email }}</td>
             <td>{{ volunteer.hours_contributed }}</td>
         </tr>
