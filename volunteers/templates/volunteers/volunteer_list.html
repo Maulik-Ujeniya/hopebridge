@@ -3,25 +3,35 @@
 {% block content %}
 <nav>
     <form method="GET" class="mb-3 d-flex" style="max-width: 400px;">
-    <input type="text" name="q" class="form-control me-2" placeholder="Search by name or email" value="{{ query|default:'' }}">
-    <button type="submit" class="btn btn-outline-primary">Search</button>
-</form>
+        <input type="text" name="q" class="form-control me-2" placeholder="Search by name or email"
+            value="{{ query|default:'' }}">
+        <button type="submit" class="btn btn-outline-primary">Search</button>
+    </form>
     <ul class="pagination">
         {% if volunteers.has_previous %}
-            <li class="page-item"><a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}">First</a></li>
-            <li class="page-item"><a class="page-link" href="?page={{ volunteers.previous_page_number }}{% if query %}&q={{ query }}{% endif %}">Previous</a></li>
+        <li class="page-item"><a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}">First</a></li>
+        <li class="page-item"><a class="page-link"
+                href="?page={{ volunteers.previous_page_number }}{% if query %}&q={{ query }}{% endif %}">Previous</a>
+        </li>
         {% endif %}
-        <li class="page-item disabled"><span class="page-link">Page {{ volunteers.number }} of {{ volunteers.paginator.num_pages }}</span></li>
+        <li class="page-item disabled"><span class="page-link">Page {{ volunteers.number }} of {{
+                volunteers.paginator.num_pages }}</span></li>
         {% if volunteers.has_next %}
-            <li class="page-item"><a class="page-link" href="?page={{ volunteers.next_page_number }}{% if query %}&q={{ query }}{% endif %}">Next</a></li>
-            <li class="page-item"><a class="page-link" href="?page={{ volunteers.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}">Last</a></li>
+        <li class="page-item"><a class="page-link"
+                href="?page={{ volunteers.next_page_number }}{% if query %}&q={{ query }}{% endif %}">Next</a></li>
+        <li class="page-item"><a class="page-link"
+                href="?page={{ volunteers.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}">Last</a></li>
         {% endif %}
     </ul>
 </nav>
 <a href="/volunteers/add/" class="btn btn-success mb-3">+ Add Volunteer</a>
 <table class="table table-striped">
     <thead>
-        <tr><th>Name</th><th>Email</th><th>Hours Contributed</th></tr>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Hours Contributed</th>
+        </tr>
     </thead>
     <tbody>
         {% for volunteer in volunteers %}
