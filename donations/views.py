@@ -82,3 +82,7 @@ def donation_create(request):
     else:
         form = DonationForm()
     return render(request, 'donations/donation_form.html', {'form': form})
+
+def donation_invoice(request, donation_id):
+    donation = get_object_or_404(Donation, id=donation_id)
+    return render(request, 'donations/donation_invoice.html', {'donation': donation})

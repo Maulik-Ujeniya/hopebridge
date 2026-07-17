@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="invoice-box">
+    <div class="invoice-header">
+        <div class="row">
+            <div class="col-6">
+                <h2 class="text-primary mb-0">HopeBridge NGO</h2>
+                <p class="text-muted mb-0">Rajkot, Gujarat, India</p>
+                <p class="text-muted mb-0">contact@hopebridge.org | +91 98765 43210</p>
+            </div>
+            <div class="col-6 text-end">
+                <h4 class="text-uppercase text-secondary">Donation Receipt</h4>
+                <p class="mb-0"><strong>Invoice No:</strong> HB-{{ donation.id|stringformat:"04d" }}</p>
+                <p class="mb-0"><strong>Date:</strong> {{ donation.date_donated }}</p>
+            </div>
+        </div>
+    </div>
+
+    <hr class="invoice-divider">
+
+    <div class="row mb-4">
+        <div class="col-6">
+            <h6 class="text-muted text-uppercase small">Received From</h6>
+            <p class="mb-0"><strong>{{ donation.donor.name }}</strong></p>
+            <p class="mb-0">{{ donation.donor.email }}</p>
+            <p class="mb-0">{{ donation.donor.phone }}</p>
+        </div>
+        <div class="col-6 text-end">
+            <h6 class="text-muted text-uppercase small">Status</h6>
+            <span class="badge bg-success px-3 py-2">Received</span>
+        </div>
+    </div>
+
+    <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>Description</th>
+                <th>Donation Type</th>
+                <th class="text-end">Amount / Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Contribution to HopeBridge NGO</td>
+                <td class="text-capitalize">{{ donation.donation_type }}</td>
+                <td class="text-end">
+                    {% if donation.amount %}
+                        ₹{{ donation.amount }}
+                    {% else %}
+                        {{ donation.quantity }} units
+                    {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="row mt-4">
+        <div class="col-6 offset-6">
+            <table class="table table-sm">
+                <tr>
+                    <th>Total Value:</th>
+                    <td class="text-end">
+                        {% if donation.amount %}₹{{ donation.amount }}{% else %}{{ donation.quantity }} units{% endif %}
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <hr class="invoice-divider">
+
+    <p class="text-center text-muted small mb-1">This is a computer-generated receipt and does not require a signature.</p>
+    <p class="text-center text-muted small">Thank you for your generous contribution to HopeBridge NGO. Together, we build hope.</p>
+
+    <div class="text-center mt-4 no-print">
+        <button onclick="window.print()" class="btn btn-primary">Print / Save as PDF</button>
+        <a href="/donations/{{ donation.id }}/" class="btn btn-secondary">Back</a>
+    </div>
+</div>
+
+<style>
+    .invoice-box {
+        max-width: 750px;
+        margin: 30px auto;
+        padding: 40px;
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.05);
+    }
+    .invoice-divider {
+        border-top: 2px solid #212529;
+    }
+    @media print {
+        .no-print, nav, footer {
+            display: none !important;
+        }
+        .invoice-box {
+            box-shadow: none;
+            border: none;
+        }
+    }
+</style>
+{% endblock %}
