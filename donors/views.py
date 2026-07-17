@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Donor
 from .forms import DonorForm
+from django.core.paginator import Paginator
 # Create your views here.
 
 def donor_list(request):
@@ -40,3 +41,10 @@ def donor_delete(request, donor_id):
         donor.delete()
         return redirect('donor_list')
     return render(request, 'donors/donor_confirm_delete.html', {'donor': donor})
+
+def donor_list(request):
+    donor_list = Donor.objects.all()
+    paginator = Paginator(donor_list, 5)  # 5 donors per page
+    page_number = request.GET.get('page')
+    donors = paginator.get_page(page_number)
+    return render(request, 'donors/donor_list.html', {'donors': donors})
