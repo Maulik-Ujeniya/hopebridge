@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Volunteer
 from .forms import VolunteerForm
 from django.core.paginator import Paginator
+from django.db.models import Q
 
 def volunteer_list(request):
     volunteers = Volunteer.objects.all()
@@ -46,3 +47,13 @@ def volunteer_list(request):
     page_number = request.GET.get('page')
     volunteers = paginator.get_page(page_number)
     return render(request, 'volunteers/volunteer_list.html', {'volunteers': volunteers})
+
+def volunteer_list(request):
+    query = request.GET.get('q')
+    volunteer_list = Volunteer.objects.all()
+    if query:
+        volunteer_list = volunteer_list.filter(Q(name__icontains=query) | Q(email__icontains=query))
+    paginator = Paginator(volunteer_list, 5)
+    page_number = request.GET.get('page')
+    volunteers = paginator.get_page(page_number)
+    return render(request, 'volunteers/volunteer_list.html', {'volunteers': volunteers, 'query': query})

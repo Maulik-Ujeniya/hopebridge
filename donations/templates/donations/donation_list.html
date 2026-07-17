@@ -2,6 +2,10 @@
 
 {% block content %}
 <nav>
+    <form method="GET" class="mb-3 d-flex" style="max-width: 400px;">
+    <input type="text" name="q" class="form-control me-2" placeholder="Search by donor name" value="{{ query|default:'' }}">
+    <button type="submit" class="btn btn-outline-primary">Search</button>
+</form>
     <ul class="pagination">
         {% if donations.has_previous %}
             <li class="page-item"><a class="page-link" href="?page=1">First</a></li>

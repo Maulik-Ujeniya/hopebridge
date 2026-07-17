@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Program
 from .forms import ProgramForm
 from django.core.paginator import Paginator
+from django.db.models import Q
 
 def program_list(request):
     programs = Program.objects.all()
@@ -45,3 +46,13 @@ def program_list(request):
     page_number = request.GET.get('page')
     programs = paginator.get_page(page_number)
     return render(request, 'programs/program_list.html', {'programs': programs})
+
+def program_list(request):
+    query = request.GET.get('q')
+    program_list = Program.objects.all()
+    if query:
+        program_list = program_list.filter(Q(name__icontains=query))
+    paginator = Paginator(program_list, 5)
+    page_number = request.GET.get('page')
+    programs = paginator.get_page(page_number)
+    return render(request, 'programs/program_list.html', {'programs': programs, 'query': query})

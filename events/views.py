@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Event
 from .forms import EventForm
 from django.core.paginator import Paginator
+from django.db.models import Q
 
 def event_list(request):
     events = Event.objects.all()
@@ -45,3 +46,13 @@ def event_list(request):
     page_number = request.GET.get('page')
     events = paginator.get_page(page_number)
     return render(request, 'events/event_list.html', {'events': events})
+
+def event_list(request):
+    query = request.GET.get('q')
+    event_list = Event.objects.all()
+    if query:
+        event_list = event_list.filter(Q(name__icontains=query))
+    paginator = Paginator(event_list, 5)
+    page_number = request.GET.get('page')
+    events = paginator.get_page(page_number)
+    return render(request, 'events/event_list.html', {'events': events, 'query': query})

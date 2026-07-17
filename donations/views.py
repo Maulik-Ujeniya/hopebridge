@@ -4,6 +4,7 @@ from .forms import DonationForm
 from django.core.mail import send_mail
 from django.contrib import messages
 from django.core.paginator import Paginator
+from django.db.models import Q
 
 def donation_list(request):
     donations = Donation.objects.all()
@@ -94,3 +95,13 @@ def donation_list(request):
     page_number = request.GET.get('page')
     donations = paginator.get_page(page_number)
     return render(request, 'donations/donation_list.html', {'donations': donations})
+
+def donation_list(request):
+    query = request.GET.get('q')
+    donation_list = Donation.objects.all()
+    if query:
+        donation_list = donation_list.filter(Q(donor__name__icontains=query))
+    paginator = Paginator(donation_list, 5)
+    page_number = request.GET.get('page')
+    donations = paginator.get_page(page_number)
+    return render(request, 'donations/donation_list.html', {'donations': donations, 'query': query})
