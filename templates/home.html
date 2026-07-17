@@ -1,12 +1,58 @@
-<!DOCTYPE html>
-<html>
-<head><title>HopeBridge</title></head>
-<body>
-  {% extends 'base.html' %}
+{% extends 'base.html' %}
 
 {% block content %}
 <h1>Welcome to HopeBridge</h1>
 <p>NGO Portal for Donations, Volunteers, and Relief Programs</p>
+
+<div class="row mt-4 mb-4">
+    <div class="col-md-3 col-6 mb-3">
+        <div class="card text-center p-3 border-primary">
+            <h3 class="text-primary">{{ total_donors }}</h3>
+            <p class="mb-0 text-muted">Total Donors</p>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 mb-3">
+        <div class="card text-center p-3 border-success">
+            <h3 class="text-success">{{ total_volunteers }}</h3>
+            <p class="mb-0 text-muted">Total Volunteers</p>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 mb-3">
+        <div class="card text-center p-3 border-warning">
+            <h3 class="text-warning">{{ total_events }}</h3>
+            <p class="mb-0 text-muted">Total Events</p>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 mb-3">
+        <div class="card text-center p-3 border-info">
+            <h3 class="text-info">{{ total_programs }}</h3>
+            <p class="mb-0 text-muted">Active Programs</p>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="card text-center p-3 bg-light">
+            <h4>₹{{ total_money_donated }}</h4>
+            <p class="mb-0 text-muted">Total Money Raised</p>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card text-center p-3 bg-light">
+            <h4>{{ total_donations_count }}</h4>
+            <p class="mb-0 text-muted">Total Donations Made</p>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card text-center p-3 bg-light">
+            <h4>{{ total_volunteer_hours }}</h4>
+            <p class="mb-0 text-muted">Volunteer Hours Contributed</p>
+        </div>
+    </div>
+</div>
+
+<h4 class="mt-4">Quick Navigation</h4>
 <div class="list-group" style="max-width: 300px;">
     <a href="/donors/" class="list-group-item list-group-item-action">Donors</a>
     <a href="/volunteers/" class="list-group-item list-group-item-action">Volunteers</a>
@@ -15,5 +61,3 @@
     <a href="/donations/" class="list-group-item list-group-item-action">Donations</a>
 </div>
 {% endblock %}
-</body>
-</html>
