@@ -2,6 +2,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Donor
 from .forms import DonorForm
 from django.core.paginator import Paginator
+from django.core.paginator import Paginator
+from django.db.models import Q
 # Create your views here.
 
 def donor_list(request):
@@ -48,3 +50,13 @@ def donor_list(request):
     page_number = request.GET.get('page')
     donors = paginator.get_page(page_number)
     return render(request, 'donors/donor_list.html', {'donors': donors})
+
+def donor_list(request):
+    query = request.GET.get('q')
+    donor_list = Donor.objects.all()
+    if query:
+        donor_list = donor_list.filter(Q(name__icontains=query) | Q(email__icontains=query))
+    paginator = Paginator(donor_list, 5)
+    page_number = request.GET.get('page')
+    donors = paginator.get_page(page_number)
+    return render(request, 'donors/donor_list.html', {'donors': donors, 'query': query})
