@@ -8,5 +8,5 @@ class Volunteer(models.Model):
     hours_contributed = models.PositiveIntegerField(default=0)
     joined_date = models.DateField(auto_now_add=True)
 
-def __str__(self):
-    return self.name
+    def __str__(self):
+        return self.name

@@ -5,8 +5,14 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 
 def volunteer_list(request):
-    volunteers = Volunteer.objects.all()
-    return render(request, 'volunteers/volunteer_list.html', {'volunteers': volunteers})
+    query = request.GET.get('q')
+    volunteer_list = Volunteer.objects.all()
+    if query:
+        volunteer_list = volunteer_list.filter(Q(name__icontains=query) | Q(email__icontains=query))
+    paginator = Paginator(volunteer_list, 5)
+    page_number = request.GET.get('page')
+    volunteers = paginator.get_page(page_number)
+    return render(request, 'volunteers/volunteer_list.html', {'volunteers': volunteers, 'query': query})
 
 def volunteer_detail(request, volunteer_id):
     volunteer = get_object_or_404(Volunteer, id=volunteer_id)
@@ -40,20 +46,3 @@ def volunteer_delete(request, volunteer_id):
         volunteer.delete()
         return redirect('volunteer_list')
     return render(request, 'volunteers/volunteer_confirm_delete.html', {'volunteer': volunteer})
-
-def volunteer_list(request):
-    volunteer_list = Volunteer.objects.all()
-    paginator = Paginator(volunteer_list, 5)
-    page_number = request.GET.get('page')
-    volunteers = paginator.get_page(page_number)
-    return render(request, 'volunteers/volunteer_list.html', {'volunteers': volunteers})
-
-def volunteer_list(request):
-    query = request.GET.get('q')
-    volunteer_list = Volunteer.objects.all()
-    if query:
-        volunteer_list = volunteer_list.filter(Q(name__icontains=query) | Q(email__icontains=query))
-    paginator = Paginator(volunteer_list, 5)
-    page_number = request.GET.get('page')
-    volunteers = paginator.get_page(page_number)
-    return render(request, 'volunteers/volunteer_list.html', {'volunteers': volunteers, 'query': query})

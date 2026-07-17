@@ -16,6 +16,5 @@ class Donation(models.Model):
     quantity = models.PositiveIntegerField(null=True,blank=True)
     date_donated = models.DateField(auto_now_add=True)
 
-
-def __str__(self):
-    return f"{self.donor.name} - {self.donation_type}"
+    def __str__(self):
+        return f"{self.donor.name} - {self.donation_type}"

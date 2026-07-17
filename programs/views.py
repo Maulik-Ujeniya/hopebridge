@@ -5,8 +5,14 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 
 def program_list(request):
-    programs = Program.objects.all()
-    return render(request, 'programs/program_list.html', {'programs': programs})
+    query = request.GET.get('q')
+    program_list = Program.objects.all()
+    if query:
+        program_list = program_list.filter(Q(name__icontains=query))
+    paginator = Paginator(program_list, 5)
+    page_number = request.GET.get('page')
+    programs = paginator.get_page(page_number)
+    return render(request, 'programs/program_list.html', {'programs': programs, 'query': query})
 
 def program_detail(request, program_id):
     program = get_object_or_404(Program, id=program_id)
@@ -39,20 +45,3 @@ def program_delete(request, program_id):
         program.delete()
         return redirect('program_list')
     return render(request, 'programs/program_confirm_delete.html', {'program': program})
-
-def program_list(request):
-    program_list = Program.objects.all()
-    paginator = Paginator(program_list, 5)
-    page_number = request.GET.get('page')
-    programs = paginator.get_page(page_number)
-    return render(request, 'programs/program_list.html', {'programs': programs})
-
-def program_list(request):
-    query = request.GET.get('q')
-    program_list = Program.objects.all()
-    if query:
-        program_list = program_list.filter(Q(name__icontains=query))
-    paginator = Paginator(program_list, 5)
-    page_number = request.GET.get('page')
-    programs = paginator.get_page(page_number)
-    return render(request, 'programs/program_list.html', {'programs': programs, 'query': query})
