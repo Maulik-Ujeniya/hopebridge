@@ -1,6 +1,19 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<nav>
+    <ul class="pagination">
+        {% if donations.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page=1">First</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ donations.previous_page_number }}">Previous</a></li>
+        {% endif %}
+        <li class="page-item disabled"><span class="page-link">Page {{ donations.number }} of {{ donations.paginator.num_pages }}</span></li>
+        {% if donations.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ donations.next_page_number }}">Next</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ donations.paginator.num_pages }}">Last</a></li>
+        {% endif %}
+    </ul>
+</nav>
 <a href="/donations/add/" class="btn btn-success mb-3">+ Add Donation</a>   
 <table class="table table-striped">
     <thead>

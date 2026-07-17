@@ -5,6 +5,19 @@
     {% extends 'base.html' %}
 
 {% block content %}
+<nav>
+    <ul class="pagination">
+        {% if programs.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page=1">First</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ programs.previous_page_number }}">Previous</a></li>
+        {% endif %}
+        <li class="page-item disabled"><span class="page-link">Page {{ programs.number }} of {{ programs.paginator.num_pages }}</span></li>
+        {% if programs.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ programs.next_page_number }}">Next</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ programs.paginator.num_pages }}">Last</a></li>
+        {% endif %}
+    </ul>
+</nav>
 <a href="/programs/add/" class="btn btn-success mb-3">+ Add Program</a>
 <table class="table table-striped">
     <thead>

@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Volunteer
 from .forms import VolunteerForm
+from django.core.paginator import Paginator
 
 def volunteer_list(request):
     volunteers = Volunteer.objects.all()
@@ -38,3 +39,10 @@ def volunteer_delete(request, volunteer_id):
         volunteer.delete()
         return redirect('volunteer_list')
     return render(request, 'volunteers/volunteer_confirm_delete.html', {'volunteer': volunteer})
+
+def volunteer_list(request):
+    volunteer_list = Volunteer.objects.all()
+    paginator = Paginator(volunteer_list, 5)
+    page_number = request.GET.get('page')
+    volunteers = paginator.get_page(page_number)
+    return render(request, 'volunteers/volunteer_list.html', {'volunteers': volunteers})

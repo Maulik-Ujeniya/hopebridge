@@ -3,6 +3,7 @@ from .models import Donation
 from .forms import DonationForm
 from django.core.mail import send_mail
 from django.contrib import messages
+from django.core.paginator import Paginator
 
 def donation_list(request):
     donations = Donation.objects.all()
@@ -86,3 +87,10 @@ def donation_create(request):
 def donation_invoice(request, donation_id):
     donation = get_object_or_404(Donation, id=donation_id)
     return render(request, 'donations/donation_invoice.html', {'donation': donation})
+
+def donation_list(request):
+    donation_list = Donation.objects.all()
+    paginator = Paginator(donation_list, 5)
+    page_number = request.GET.get('page')
+    donations = paginator.get_page(page_number)
+    return render(request, 'donations/donation_list.html', {'donations': donations})

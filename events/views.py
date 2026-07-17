@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Event
 from .forms import EventForm
+from django.core.paginator import Paginator
 
 def event_list(request):
     events = Event.objects.all()
@@ -37,3 +38,10 @@ def event_delete(request, event_id):
         event.delete()
         return redirect('event_list')
     return render(request, 'events/event_confirm_delete.html', {'event': event})
+
+def event_list(request):
+    event_list = Event.objects.all()
+    paginator = Paginator(event_list, 5)
+    page_number = request.GET.get('page')
+    events = paginator.get_page(page_number)
+    return render(request, 'events/event_list.html', {'events': events})
