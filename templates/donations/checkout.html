@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Checkout — HopeBridge{% endblock %}
+
+{% block content %}
+<div style="padding-top: 140px; padding-bottom: 6rem; max-width: 550px; margin: 0 auto; padding-left: 1.5rem; padding-right: 1.5rem;">
+    <div class="hb-card page-enter" style="text-align: center;">
+        <h2 style="margin-bottom: 1rem;">Payment Checkout</h2>
+        <p style="color: var(--gray-500); margin-bottom: 2rem;">Please review your donation details before completing the payment.</p>
+
+        <!-- Summary -->
+        <div style="background: var(--gray-50); border-radius: var(--radius-md); padding: 1.5rem; text-align: left; margin-bottom: 2.5rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                <span style="color: var(--gray-500);">Donor:</span>
+                <span style="font-weight: 600; color: var(--gray-800);">{{ donation.name }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                <span style="color: var(--gray-500);">Email:</span>
+                <span style="font-weight: 600; color: var(--gray-800);">{{ donation.email }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                <span style="color: var(--gray-500);">Category:</span>
+                <span style="font-weight: 600; color: var(--gray-800);">{{ donation.get_donation_type_display }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                <span style="color: var(--gray-500);">Invoice Code:</span>
+                <span style="font-weight: 600; color: var(--gray-800);">{{ donation.invoice_number }}</span>
+            </div>
+            <hr style="border: 0; border-top: 1px solid var(--gray-200); margin: 1rem 0;">
+            <div style="display: flex; justify-content: space-between; font-size: 1.2rem;">
+                <span style="font-weight: 700; color: var(--gray-800);">Total Amount:</span>
+                <span style="font-weight: 800; color: var(--primary);">₹{{ donation.amount }}</span>
+            </div>
+        </div>
+
+        <!-- Pay Button -->
+        <button id="pay-btn" class="btn-primary-hb btn-lg" style="width: 100%; justify-content: center;">
+            🔒 Pay Securely with Razorpay
+        </button>
+
+        <form id="razorpay-form" action="{% url 'donations:payment_callback' %}" method="POST" style="display: none;">
+            {% csrf_token %}
+            <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
+            <input type="hidden" name="razorpay_order_id" id="razorpay_order_id">
+            <input type="hidden" name="razorpay_signature" id="razorpay_signature">
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    var options = {
+        "key": "{{ razorpay_key_id }}",
+        "amount": "{{ amount_paise }}",
+        "currency": "INR",
+        "name": "HopeBridge NGO",
+        "description": "Donation for {{ donation.get_donation_type_display }}",
+        "order_id": "{{ razorpay_order_id }}",
+        "handler": function (response){
+            document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+            document.getElementById('razorpay_order_id').value = response.razorpay_order_id;
+            document.getElementById('razorpay_signature').value = response.razorpay_signature;
+            document.getElementById('razorpay_form').submit();
+        },
+        "prefill": {
+            "name": "{{ donation.name }}",
+            "email": "{{ donation.email }}",
+            "contact": "{{ donation.phone }}"
+        },
+        "theme": {
+            "color": "#6C63FF"
+        }
+    };
+    var rzp1 = new Razorpay(options);
+    document.getElementById('pay-btn').onclick = function(e){
+        rzp1.open();
+        e.preventDefault();
+    }
+</script>
+{% endblock %}

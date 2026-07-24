@@ -1,8 +1,5 @@
 from django.contrib import admin
-from .models import Volunteer
+from .models import VolunteerProfile, VolunteerWorkLog
 
-# Register your models here.
-
-admin.site.register(Volunteer)
-
-
+admin.site.register(VolunteerProfile)
+admin.site.register(VolunteerWorkLog)

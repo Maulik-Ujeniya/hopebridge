@@ -1,0 +1,71 @@
+{% extends 'volunteers/base_volunteer.html' %}
+{% load static %}
+
+{% block title %}My Schedule — Volunteer Dashboard{% endblock %}
+
+{% block volunteer_content %}
+    <div style="margin-bottom: 2rem;">
+        <h2><i data-lucide="calendar" size="28" style="vertical-align: middle; color: var(--primary);"></i> My Schedule</h2>
+    </div>
+
+    <div class="grid grid-2" style="gap: 2rem;">
+        
+        <!-- Upcoming Events -->
+        <div class="hb-card animate-on-scroll">
+            <h4 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="calendar-check" size="20" style="color: var(--secondary);"></i> Upcoming Events</h4>
+            {% if upcoming_events %}
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    {% for event in upcoming_events %}
+                        <div style="display: flex; gap: 1.25rem; align-items: flex-start; padding-bottom: 1rem; border-bottom: 1px solid var(--gray-200);">
+                            <div style="background: rgba(16, 185, 129, 0.1); color: var(--success); padding: 0.75rem; text-align: center; border-radius: var(--radius-md); min-width: 60px;">
+                                <div style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">{{ event.date|date:"M" }}</div>
+                                <div style="font-size: 1.5rem; font-weight: 800;">{{ event.date|date:"d" }}</div>
+                            </div>
+                            <div>
+                                <h5 style="margin-bottom: 0.25rem;">{{ event.name }}</h5>
+                                <div style="display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.85rem; color: var(--gray-500); margin-bottom: 0.5rem;">
+                                    <span><i data-lucide="clock" size="14" style="vertical-align: middle;"></i> {% if event.start_time %}{{ event.start_time|time:"g:i A" }}{% else %}TBA{% endif %}</span>
+                                    <span><i data-lucide="map-pin" size="14" style="vertical-align: middle;"></i> {{ event.location|default:"TBA" }}</span>
+                                </div>
+                                <p style="font-size: 0.85rem; color: var(--gray-600); margin: 0;">{{ event.description|truncatewords:10 }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div style="padding: 2rem; text-align: center; background: var(--gray-50); border-radius: var(--radius-md);">
+                    <p style="color: var(--gray-500); margin: 0;">No upcoming events scheduled.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Active Drive Assignments -->
+        <div class="hb-card animate-on-scroll" style="animation-delay: 0.1s;">
+            <h4 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="briefcase" size="20" style="color: var(--primary);"></i> Active Drives</h4>
+            {% if assigned_drives %}
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    {% for assoc in assigned_drives %}
+                        <div style="padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--primary-light); background: rgba(108, 99, 255, 0.03);">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                                <h5><a href="{% url 'drives:drive_detail' assoc.drive.id %}">{{ assoc.drive.title }}</a></h5>
+                                <span class="status-badge" style="background: rgba(108, 99, 255, 0.1); color: var(--primary); font-size: 0.75rem;">{{ assoc.get_role_in_drive_display }}</span>
+                            </div>
+                            
+                            <div style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 1rem;">
+                                <p style="margin-bottom: 0.25rem;"><i data-lucide="calendar" size="14" style="vertical-align: middle;"></i> {{ assoc.drive.start_date|date:"d M Y" }} {% if assoc.drive.end_date %} - {{ assoc.drive.end_date|date:"d M Y" }}{% endif %}</p>
+                                <p style="margin: 0;"><i data-lucide="map-pin" size="14" style="vertical-align: middle;"></i> {{ assoc.drive.location_city }}</p>
+                            </div>
+                            
+                            <a href="{% url 'volunteers:log_work' %}?drive_id={{ assoc.drive.id }}" class="btn-secondary-hb btn-sm" style="display: inline-block; width: 100%; text-align: center;">Log Hours</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div style="padding: 2rem; text-align: center; background: var(--gray-50); border-radius: var(--radius-md);">
+                    <p style="color: var(--gray-500); margin: 0;">You don't have any active drives.</p>
+                </div>
+            {% endif %}
+        </div>
+        
+    </div>
+{% endblock %}

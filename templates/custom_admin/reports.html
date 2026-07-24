@@ -1,0 +1,43 @@
+{% extends 'custom_admin/base_admin.html' %}
+
+{% block page_title %}Reports & Exports{% endblock %}
+
+{% block content %}
+<div class="grid grid-2" style="gap: 2rem;">
+    
+    <!-- Export Donations -->
+    <div class="admin-card">
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+            <div style="width: 64px; height: 64px; background: rgba(99, 102, 241, 0.1); color: var(--admin-accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                <i data-lucide="wallet" size="32"></i>
+            </div>
+            <h3 style="margin: 0; color: var(--admin-primary);">Donation Reports</h3>
+            <p style="color: var(--gray-500); font-size: 0.9rem; margin-top: 0.5rem;">Export a complete list of all donations for tax and accounting purposes.</p>
+        </div>
+        
+        <form method="post" action="{% url 'custom_admin:reports_view' %}" style="text-align: center;">
+            {% csrf_token %}
+            <input type="hidden" name="report_type" value="donations">
+            <button type="submit" class="btn-primary-hb" style="width: 100%;"><i data-lucide="download" size="18" style="vertical-align: middle; margin-right: 0.5rem;"></i> Download CSV</button>
+        </form>
+    </div>
+    
+    <!-- Export Users -->
+    <div class="admin-card">
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+            <div style="width: 64px; height: 64px; background: rgba(16, 185, 129, 0.1); color: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                <i data-lucide="users" size="32"></i>
+            </div>
+            <h3 style="margin: 0; color: var(--admin-primary);">User Registry</h3>
+            <p style="color: var(--gray-500); font-size: 0.9rem; margin-top: 0.5rem;">Export the list of all registered donors, volunteers, and admins.</p>
+        </div>
+        
+        <form method="post" action="{% url 'custom_admin:reports_view' %}" style="text-align: center;">
+            {% csrf_token %}
+            <input type="hidden" name="report_type" value="users">
+            <button type="submit" class="btn-primary-hb" style="width: 100%; background-color: var(--success);"><i data-lucide="download" size="18" style="vertical-align: middle; margin-right: 0.5rem;"></i> Download CSV</button>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

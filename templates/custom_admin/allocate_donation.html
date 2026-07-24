@@ -1,0 +1,54 @@
+{% extends 'custom_admin/base_admin.html' %}
+{% load static %}
+
+{% block page_title %}Allocate Funds{% endblock %}
+
+{% block content %}
+    <div class="admin-card" style="max-width: 600px;">
+        <h2 style="margin-bottom: 0.5rem; color: var(--admin-primary);">💰 Allocate Donation Funds</h2>
+        <p style="color: var(--gray-500); margin-bottom: 2rem;">Distribute donation amount {{ donation.invoice_number }} to active drives.</p>
+
+        <!-- Stats overview -->
+        <div style="background: var(--gray-50); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span style="color: var(--gray-500);">Total Donation Amount:</span>
+                <span style="font-weight: 700; color: var(--gray-800);">₹{{ donation.amount }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span style="color: var(--gray-500);">Unallocated Amount:</span>
+                <span style="font-weight: 800; color: var(--primary);">₹{{ pending_allocation }}</span>
+            </div>
+        </div>
+
+        {% if pending_allocation > 0 %}
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="hb-form-group">
+                    <label for="drive_id">Select Active Drive *</label>
+                    <select name="drive_id" id="drive_id" class="hb-form-control" required>
+                        <option value="">Choose active drive</option>
+                        {% for d in active_drives %}
+                            <option value="{{ d.id }}">{{ d.title }} (Allocated: ₹{{ d.budget_allocated }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="hb-form-group">
+                    <label for="amount">Allocation Amount (INR) *</label>
+                    <input type="number" name="amount" id="amount" step="0.01" min="0.01" max="{{ pending_allocation }}" class="hb-form-control" placeholder="Max: ₹{{ pending_allocation }}" required>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <a href="{% url 'custom_admin:donation_list' %}" class="btn-outline-hb">Cancel</a>
+                    <button type="submit" class="btn-primary-hb">Confirm Allocation</button>
+                </div>
+            </form>
+        {% else %}
+            <div style="background: rgba(16, 185, 129, 0.1); color: var(--success); padding: 1rem; border-radius: var(--radius-md); font-weight: 600; text-align: center; margin-bottom: 1rem;">
+                ✓ This donation has been fully allocated to drives.
+            </div>
+            <a href="{% url 'custom_admin:donation_list' %}" class="btn-primary-hb" style="width: 100%; justify-content: center;">Back to Ledger</a>
+        {% endif %}
+    </div>
+{% endblock %}

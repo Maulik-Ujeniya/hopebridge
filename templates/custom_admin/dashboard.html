@@ -1,0 +1,174 @@
+{% extends 'custom_admin/base_admin.html' %}
+{% load static %}
+
+{% block page_title %}Overview Dashboard{% endblock %}
+
+{% block content %}
+<div class="grid grid-4" style="gap: 1.5rem; margin-bottom: 2rem;">
+    <!-- Top KPI Cards -->
+    <div class="admin-card" style="border-left: 4px solid var(--admin-accent);">
+        <p style="color: var(--gray-500); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin-bottom: 0.5rem;">Total Donations</p>
+        <h3 style="margin: 0; font-size: 1.8rem; color: var(--admin-primary);">₹{{ total_raised }}</h3>
+        <p style="margin: 0.5rem 0 0; font-size: 0.8rem; color: var(--success);"><i data-lucide="trending-up" size="14" style="vertical-align: middle;"></i> ₹{{ today_donations }} today</p>
+    </div>
+    
+    <div class="admin-card" style="border-left: 4px solid #f59e0b;">
+        <p style="color: var(--gray-500); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin-bottom: 0.5rem;">Budget Spent</p>
+        <h3 style="margin: 0; font-size: 1.8rem; color: var(--admin-primary);">₹{{ spent_budget }}</h3>
+        <p style="margin: 0.5rem 0 0; font-size: 0.8rem; color: var(--gray-500);">Out of ₹{{ allocated_budget }} allocated</p>
+    </div>
+    
+    <div class="admin-card" style="border-left: 4px solid #10b981;">
+        <p style="color: var(--gray-500); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin-bottom: 0.5rem;">Active Volunteers</p>
+        <h3 style="margin: 0; font-size: 1.8rem; color: var(--admin-primary);">{{ total_volunteers }}</h3>
+        <p style="margin: 0.5rem 0 0; font-size: 0.8rem; color: var(--gray-500);">Ready to deploy</p>
+    </div>
+    
+    <div class="admin-card" style="border-left: 4px solid #ef4444;">
+        <p style="color: var(--gray-500); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin-bottom: 0.5rem;">Active Campaigns</p>
+        <h3 style="margin: 0; font-size: 1.8rem; color: var(--admin-primary);">{{ active_drives }}</h3>
+        <p style="margin: 0.5rem 0 0; font-size: 0.8rem; color: var(--gray-500);">Across {{ active_programs }} programs</p>
+    </div>
+</div>
+
+<!-- Charts Section -->
+<div class="grid grid-3" style="gap: 1.5rem; margin-bottom: 2rem;">
+    <div class="admin-card" style="grid-column: span 2;">
+        <h4 style="margin-bottom: 1.5rem; color: var(--admin-primary);">Donation Growth (Last 6 Months)</h4>
+        <canvas id="monthlyDonationsChart" height="100"></canvas>
+    </div>
+    <div class="admin-card">
+        <h4 style="margin-bottom: 1.5rem; color: var(--admin-primary);">Donations by Category</h4>
+        <canvas id="categoryChart" height="200"></canvas>
+    </div>
+</div>
+
+<!-- Recent Data Tables -->
+<div class="grid grid-2" style="gap: 1.5rem;">
+    <!-- Recent Donations -->
+    <div class="admin-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h4 style="margin: 0; color: var(--admin-primary);">Recent Transactions</h4>
+            <a href="{% url 'custom_admin:donation_list' %}" style="font-size: 0.85rem; color: var(--admin-accent); text-decoration: none; font-weight: 600;">View All</a>
+        </div>
+        
+        <table class="table-admin">
+            <thead>
+                <tr>
+                    <th>Donor</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for don in recent_donations %}
+                <tr>
+                    <td>
+                        <div style="font-weight: 600;">{{ don.name }}</div>
+                        <div style="font-size: 0.8rem; color: var(--gray-500);">{{ don.invoice_number }}</div>
+                    </td>
+                    <td style="font-weight: 700; color: var(--admin-primary);">₹{{ don.amount }}</td>
+                    <td><span class="badge badge-success">Completed</span></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3" style="text-align: center; color: var(--gray-500);">No recent transactions</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Recent Users -->
+    <div class="admin-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h4 style="margin: 0; color: var(--admin-primary);">New Members</h4>
+            <a href="{% url 'custom_admin:user_list' %}" style="font-size: 0.85rem; color: var(--admin-accent); text-decoration: none; font-weight: 600;">View All</a>
+        </div>
+        
+        <table class="table-admin">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Role</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in recent_users %}
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <img src="{{ u.profile_picture_url }}" alt="img" style="width: 32px; height: 32px; border-radius: 50%;">
+                            <div>
+                                <div style="font-weight: 600;">{{ u.get_full_name|default:u.email }}</div>
+                                <div style="font-size: 0.8rem; color: var(--gray-500);">Joined {{ u.date_joined|date:"M d" }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge {% if u.role == 'volunteer' %}badge-info{% elif u.role == 'donor' %}badge-success{% else %}badge-warning{% endif %}">
+                            {{ u.role|title }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'custom_admin:user_detail' u.id %}" class="btn-outline-hb btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Manage</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3" style="text-align: center; color: var(--gray-500);">No recent members</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Monthly Donations Line Chart
+    const ctxMonthly = document.getElementById('monthlyDonationsChart').getContext('2d');
+    new Chart(ctxMonthly, {
+        type: 'line',
+        data: {
+            labels: {{ monthly_labels|safe }},
+            datasets: [{
+                label: 'Donations (₹)',
+                data: {{ monthly_data|safe }},
+                borderColor: '#6366f1',
+                backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { borderDash: [5, 5] } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    // Category Breakdown Doughnut Chart
+    const ctxCategory = document.getElementById('categoryChart').getContext('2d');
+    new Chart(ctxCategory, {
+        type: 'doughnut',
+        data: {
+            labels: {{ category_labels|safe }},
+            datasets: [{
+                data: {{ category_data|safe }},
+                backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }
+            },
+            cutout: '75%'
+        }
+    });
+</script>
+{% endblock %}

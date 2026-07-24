@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onboarding — Step {{ step }} of {{ total_steps }} — HopeBridge</title>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/animations.css' %}">
+</head>
+<body>
+    <div class="auth-page">
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+
+        <div class="auth-card" style="max-width: 560px;">
+            <div style="text-align: center; margin-bottom: 1rem;">
+                <span class="text-gradient" style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800;">HopeBridge</span>
+            </div>
+
+            <!-- Progress Indicator -->
+            <div class="onboarding-progress">
+                {% for s in "1234" %}
+                    <div class="step-indicator">
+                        <div class="step-dot {% if forloop.counter < step %}completed{% elif forloop.counter == step %}active{% endif %}">
+                            {% if forloop.counter < step %}✓{% else %}{{ forloop.counter }}{% endif %}
+                        </div>
+                        {% if not forloop.last %}
+                            <div class="step-line {% if forloop.counter < step %}completed{% endif %}"></div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <h1 style="font-size: 1.6rem;">Choose Your Role</h1>
+            <p class="auth-subtitle">What role best describes how you'd like to contribute?</p>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="hb-form-group">
+                    <label for="id_preferred_role" style="color: rgba(255,255,255,0.8);">Preferred Role</label>
+                    {{ form.preferred_role }}
+                    {{ form.preferred_role.errors }}
+                </div>
+
+                <div class="hb-form-group">
+                    <label for="id_experience_level" style="color: rgba(255,255,255,0.8);">Experience Level</label>
+                    {{ form.experience_level }}
+                    {{ form.experience_level.errors }}
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <a href="{% url 'onboarding_step1' %}" class="btn-secondary-hb" style="flex: 1; justify-content: center; border-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.7);">
+                        ← Back
+                    </a>
+                    <button type="submit" class="btn-primary-hb" style="flex: 2; justify-content: center;">
+                        Continue →
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

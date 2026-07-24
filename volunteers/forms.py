@@ -1,7 +1,14 @@
 from django import forms
-from .models import Volunteer
+from .models import VolunteerProfile
+
 
 class VolunteerForm(forms.ModelForm):
     class Meta:
-        model = Volunteer
-        fields = ['name', 'email', 'phone', 'hours_contributed']
+        model = VolunteerProfile
+        fields = [
+            'skills',
+            'availability',
+            'hours_per_week',
+            'bio',
+            'certifications',
+        ]

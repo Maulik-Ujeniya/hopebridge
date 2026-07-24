@@ -1,0 +1,84 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onboarding — Step {{ step }} of {{ total_steps }} — HopeBridge</title>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/animations.css' %}">
+</head>
+<body>
+    <div class="auth-page">
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+
+        <div class="auth-card" style="max-width: 560px;">
+            <div style="text-align: center; margin-bottom: 1rem;">
+                <span class="text-gradient" style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800;">HopeBridge</span>
+            </div>
+
+            <!-- Progress Indicator -->
+            <div class="onboarding-progress">
+                {% for s in "1234" %}
+                    <div class="step-indicator">
+                        <div class="step-dot {% if forloop.counter|stringformat:'s' < step|stringformat:'s' %}completed{% elif forloop.counter == step %}active{% endif %}">
+                            {% if forloop.counter|stringformat:'s' < step|stringformat:'s' %}✓{% else %}{{ forloop.counter }}{% endif %}
+                        </div>
+                        {% if not forloop.last %}
+                            <div class="step-line {% if forloop.counter|stringformat:'s' < step|stringformat:'s' %}completed{% endif %}"></div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <h1 style="font-size: 1.6rem;">How Would You Like to Contribute?</h1>
+            <p class="auth-subtitle">Tell us what interests you — you can always change this later</p>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div style="display: flex; flex-direction: column; gap: 1rem; margin: 2rem 0;">
+                    <!-- Donate Card -->
+                    <label style="display: flex; align-items: center; gap: 1rem; padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: all 0.3s;">
+                        {{ form.wants_to_donate }}
+                        <div>
+                            <div style="color: var(--white); font-weight: 600; font-size: 1rem;">💰 Make Donations</div>
+                            <div style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">Support our drives financially — every rupee counts</div>
+                        </div>
+                    </label>
+
+                    <!-- Volunteer Card -->
+                    <label style="display: flex; align-items: center; gap: 1rem; padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: all 0.3s;">
+                        {{ form.wants_to_volunteer }}
+                        <div>
+                            <div style="color: var(--white); font-weight: 600; font-size: 1rem;">🤝 Volunteer On-Ground</div>
+                            <div style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">Join drives, events, and make a hands-on impact</div>
+                        </div>
+                    </label>
+
+                    <!-- Manage Card -->
+                    <label style="display: flex; align-items: center; gap: 1rem; padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: all 0.3s;">
+                        {{ form.wants_to_manage }}
+                        <div>
+                            <div style="color: var(--white); font-weight: 600; font-size: 1rem;">📋 Manage & Organize</div>
+                            <div style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">Lead drives, manage teams, and coordinate operations</div>
+                        </div>
+                    </label>
+                </div>
+
+                <div style="display: flex; gap: 1rem;">
+                    <a href="{% url 'home' %}" class="btn-secondary-hb" style="flex: 1; justify-content: center; border-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.7);">
+                        ← Skip
+                    </a>
+                    <button type="submit" class="btn-primary-hb" style="flex: 2; justify-content: center;">
+                        Continue →
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

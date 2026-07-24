@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Donor Details — HopeBridge{% endblock %}
+
+{% block content %}
+<div style="padding-top: 120px; padding-bottom: 4rem; max-width: 1000px; margin: 0 auto; padding-left: 1.5rem; padding-right: 1.5rem;">
+    <div class="hb-card" style="margin-bottom: 1.5rem;">
+        <h2>{{ donor.name }}</h2>
+        <p style="color: var(--gray-500);">{{ donor.email }} | {{ donor.phone }}</p>
+        <p>Total Donated: ₹{{ donor.total_donated }}</p>
+    </div>
+
+    <div class="hb-card">
+        <h4 style="margin-bottom: 1rem;">Donation History</h4>
+        {% if donations %}
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; min-width: 520px;">
+                    <thead>
+                        <tr style="text-align: left; border-bottom: 1px solid var(--gray-200);">
+                            <th style="padding: 0.75rem 0;">Date</th>
+                            <th style="padding: 0.75rem 0;">Invoice</th>
+                            <th style="padding: 0.75rem 0;">Amount</th>
+                            <th style="padding: 0.75rem 0;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for donation in donations %}
+                        <tr style="border-bottom: 1px solid var(--gray-100);">
+                            <td style="padding: 0.75rem 0;">{{ donation.date_donated|date:"d M Y" }}</td>
+                            <td style="padding: 0.75rem 0;">{{ donation.invoice_number }}</td>
+                            <td style="padding: 0.75rem 0;">₹{{ donation.amount }}</td>
+                            <td style="padding: 0.75rem 0;">{{ donation.get_payment_status_display }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p style="color: var(--gray-500);">No donation records matched this donor email.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

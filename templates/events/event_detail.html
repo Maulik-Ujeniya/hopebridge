@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ event.name }} — HopeBridge{% endblock %}
+
+{% block content %}
+<div style="padding-top: 120px; padding-bottom: 6rem;" class="container page-enter">
+    <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 2rem;">
+        <a href="{% url 'events:event_list' %}" class="btn-outline-hb btn-sm">← Back to Events</a>
+    </div>
+
+    <div class="grid grid-3" style="gap: 2rem; align-items: start;">
+        <!-- Left Panel: Event Info -->
+        <div style="grid-column: span 2; display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Main details card -->
+            <div class="hb-card">
+                <span style="font-size: 0.8rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 0.5rem;">
+                    {{ event.get_event_type_display }}
+                </span>
+                <h1 style="font-size: 2.2rem; margin-bottom: 1rem; font-family: var(--font-display);">{{ event.name }}</h1>
+                <p style="color: var(--gray-500); font-size: 0.95rem; margin-bottom: 2rem;">📍 {{ event.location }}, {{ event.city }}</p>
+
+                <h4 style="color: var(--primary); margin-bottom: 0.75rem;">Description</h4>
+                <p style="color: var(--gray-700); line-height: 1.8; margin-bottom: 2rem; font-size: 1.05rem;">
+                    {{ event.description }}
+                </p>
+
+                <div class="grid grid-2" style="gap: 1.5rem; background: var(--gray-50); border-radius: var(--radius-md); padding: 1.5rem; margin-top: 2rem;">
+                    <div>
+                        <span style="font-size: 0.8rem; color: var(--gray-500); text-transform: uppercase;">Allocated Budget</span>
+                        <p style="font-size: 1.3rem; font-weight: 800; color: var(--gray-800); margin-top: 0.25rem;">₹{{ event.budget_allocated }}</p>
+                    </div>
+                    <div>
+                        <span style="font-size: 0.8rem; color: var(--gray-500); text-transform: uppercase;">Max Capacity</span>
+                        <p style="font-size: 1.3rem; font-weight: 800; color: var(--primary); margin-top: 0.25rem;">
+                            {% if event.max_participants > 0 %}{{ event.max_participants }} People{% else %}Unlimited{% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Actions & Registrations -->
+        <div style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Register Card -->
+            <div class="hb-card" style="border-top: 4px solid var(--primary); text-align: center;">
+                <h4 style="margin-bottom: 0.5rem;">Registration</h4>
+                <p style="color: var(--gray-500); font-size: 0.85rem; margin-bottom: 1.5rem;">Join us as a participant or helper at this event.</p>
+
+                <div style="display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.85rem; text-align: left; background: var(--gray-50); padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.5rem;">
+                    <span style="color: var(--gray-600);">📅 <b>Date:</b> {{ event.date|date:"d M Y" }}</span>
+                    <span style="color: var(--gray-600);">⏰ <b>Time:</b> {{ event.start_time|default:"N/A" }} — {{ event.end_time|default:"N/A" }}</span>
+                </div>
+
+                {% if is_registered %}
+                    <div style="background: rgba(16, 185, 129, 0.1); color: var(--success); padding: 0.85rem; border-radius: var(--radius-md); font-weight: 600; font-size: 0.9rem;">
+                        ✓ Registered Successfully
+                    </div>
+                {% else %}
+                    {% if user.is_authenticated %}
+                        <form method="POST" action="{% url 'events:register_event' event.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-primary-hb btn-lg" style="width: 100%; justify-content: center;">
+                                Register for Event
+                            </button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'login' %}?next={{ request.path }}" class="btn-primary-hb btn-lg" style="width: 100%; justify-content: center;">
+                            Login to Register
+                        </a>
+                    {% endif %}
+                {% endif %}
+            </div>
+
+            <!-- Organizer information -->
+            <div class="hb-card">
+                <h4 style="margin-bottom: 1.5rem;">Event Organizer</h4>
+                {% if event.organizer %}
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <img src="{{ event.organizer.profile_picture_url }}" alt="Profile" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover;">
+                        <div>
+                            <h5 style="font-size: 0.95rem; font-family: var(--font-display);">{{ event.organizer.get_full_name }}</h5>
+                            <p style="font-size: 0.8rem; color: var(--gray-500);">Event Coordinator</p>
+                        </div>
+                    </div>
+                {% else %}
+                    <p style="color: var(--gray-400); font-style: italic;">No organizer assigned yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

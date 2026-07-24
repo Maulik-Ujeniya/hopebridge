@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block title %}Notification Center — HopeBridge{% endblock %}
+{% block content %}
+<div style="padding-top: 100px; max-width: 1000px; margin: 0 auto; padding-left: 1.5rem; padding-right: 1.5rem; padding-bottom: 4rem;" class="page-enter">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h2 style="margin-bottom: 0.5rem;"><i data-lucide="bell" style="vertical-align: -3px; margin-right: 0.5rem;"></i> Notification Center</h2>
+            <p style="color: var(--gray-500); margin: 0;">You have {{ unread_count }} unread messages.</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+            <button onclick="markAllNotificationsRead()" class="btn-outline-hb btn-sm"><i data-lucide="check-check" size="16" style="vertical-align: middle; margin-right: 0.25rem;"></i> Mark All Read</button>
+        </div>
+    </div>
+
+    <!-- Filters & Search -->
+    <div class="hb-card" style="margin-bottom: 2rem; padding: 1rem 1.5rem;">
+        <form method="get" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+            <div style="flex: 1; min-width: 250px; display: flex; align-items: center; border: 1px solid var(--gray-300); border-radius: var(--radius-sm); padding: 0.5rem;">
+                <i data-lucide="search" size="18" style="color: var(--gray-400); margin-right: 0.5rem;"></i>
+                <input type="text" name="q" placeholder="Search notifications..." value="{{ query }}" style="border: none; outline: none; width: 100%; background: transparent;">
+            </div>
+            
+            <div style="display: flex; gap: 0.5rem; align-items: center; overflow-x: auto; padding-bottom: 5px;">
+                <a href="{% url 'notifications:notification_list' %}" class="btn-sm {% if not category_filter %}btn-primary-hb{% else %}btn-outline-hb{% endif %}" style="padding: 0.4rem 1rem;">All</a>
+                {% for code, name in categories %}
+                    <a href="?category={{ code }}" class="btn-sm {% if category_filter == code %}btn-primary-hb{% else %}btn-outline-hb{% endif %}" style="padding: 0.4rem 1rem; white-space: nowrap;">{{ name }}</a>
+                {% endfor %}
+            </div>
+        </form>
+    </div>
+
+    <div class="hb-card" style="padding: 0; overflow: hidden;">
+        {% if notifications %}
+            <div style="display: flex; flex-direction: column;">
+                {% for notif in notifications %}
+                    <div id="notif-{{ notif.id }}" style="padding: 1.5rem; border-bottom: 1px solid var(--gray-200); background: {% if not notif.is_read %}rgba(99, 102, 241, 0.03){% else %}var(--white){% endif %}; transition: background 0.3s; display: flex; justify-content: space-between; align-items: flex-start; gap: 1.5rem;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; gap: 0.75rem; align-items: center; margin-bottom: 0.5rem;">
+                                {% if not notif.is_read %}
+                                    <div style="width: 8px; height: 8px; background: var(--primary); border-radius: 50%;"></div>
+                                {% endif %}
+                                <span style="font-size: 0.75rem; font-weight: 600; color: var(--primary); text-transform: uppercase; background: rgba(99, 102, 241, 0.1); padding: 0.2rem 0.5rem; border-radius: 4px;">{{ notif.get_category_display }}</span>
+                                <span style="font-size: 0.8rem; color: var(--gray-500);"><i data-lucide="clock" size="12" style="vertical-align: -1px; margin-right: 0.25rem;"></i>{{ notif.created_at|date:"d M Y, h:i A" }}</span>
+                            </div>
+                            <h5 style="margin: 0 0 0.5rem; font-size: 1.1rem; color: var(--gray-900);">{{ notif.title }}</h5>
+                            <p style="margin: 0 0 1rem; font-size: 0.95rem; color: var(--gray-600); line-height: 1.5;">{{ notif.message }}</p>
+                            
+                            <div style="display: flex; gap: 0.5rem;">
+                                {% if notif.link %}
+                                    <a href="{{ notif.link }}" class="btn-primary-hb btn-sm" style="padding: 0.35rem 0.75rem;">View Details</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 0.5rem; flex-direction: column; align-items: flex-end;">
+                            {% if not notif.is_read %}
+                                <button onclick="markNotificationRead({{ notif.id }})" class="btn-outline-hb btn-sm" style="padding: 0.35rem 0.75rem; border-color: var(--success); color: var(--success);" title="Mark Read"><i data-lucide="check" size="16"></i></button>
+                            {% endif %}
+                            <form method="post" action="{% url 'notifications:archive' notif.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-outline-hb btn-sm" style="padding: 0.35rem 0.75rem; color: var(--gray-500);" title="Archive"><i data-lucide="archive" size="16"></i></button>
+                            </form>
+                            <form method="post" action="{% url 'notifications:delete' notif.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-outline-hb btn-sm" style="padding: 0.35rem 0.75rem; border-color: var(--danger); color: var(--danger);" title="Delete" onclick="return confirm('Are you sure you want to delete this notification?');"><i data-lucide="trash-2" size="16"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 4rem 1rem; color: var(--gray-400);">
+                <div style="width: 80px; height: 80px; background: rgba(0,0,0,0.03); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+                    <i data-lucide="bell-off" size="32" style="color: var(--gray-400);"></i>
+                </div>
+                <h4 style="color: var(--gray-600); margin-bottom: 0.5rem;">All caught up!</h4>
+                <p style="font-size: 0.95rem; max-width: 400px; margin: 0 auto;">You have no notifications matching this criteria.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function markNotificationRead(id) {
+        fetch(`/notifications/mark-read/${id}/`, {
+            method: 'POST',
+            headers: {'X-CSRFToken': '{{ csrf_token }}'}
+        }).then(() => {
+            window.location.reload();
+        });
+    }
+    function markAllNotificationsRead() {
+        fetch("{% url 'notifications:mark_all_read' %}", {
+            method: 'POST',
+            headers: {'X-CSRFToken': '{{ csrf_token }}'}
+        }).then(() => {
+            window.location.reload();
+        });
+    }
+</script>
+{% endblock %}

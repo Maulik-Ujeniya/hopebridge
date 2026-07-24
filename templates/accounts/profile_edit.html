@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Profile | HopeBridge{% endblock %}
+
+{% block content %}
+<div style="background: var(--gray-50); min-height: calc(100vh - 70px); padding: 3rem 0;">
+    <div class="container" style="max-width: 900px;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h1 style="font-family: var(--font-display); font-size: 2.25rem; margin: 0;">Edit Profile</h1>
+            <a href="{% url 'profile' %}" class="btn-outline-hb btn-sm">
+                <i data-lucide="arrow-left" size="16"></i> Back to Profile
+            </a>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="hb-form">
+            {% csrf_token %}
+            
+            <div style="display: flex; flex-direction: column; gap: 2rem;">
+                
+                <!-- Section 1: Basic Information -->
+                <div class="hb-card" style="padding: 2rem;">
+                    <h3 style="font-family: var(--font-display); font-size: 1.25rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--gray-200); padding-bottom: 0.75rem;">Basic Information</h3>
+                    
+                    <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 2rem;">
+                        <div id="profile-pic-preview" style="width: 120px; height: 120px; border-radius: 50%; background: var(--gray-100); border: 2px dashed var(--gray-300); display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; overflow: hidden; position: relative;">
+                            {% if request.user.profile_picture %}
+                                <img id="profile-pic-img" src="{{ request.user.profile_picture_url }}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                                <i data-lucide="image" size="32" color="var(--gray-400)" id="profile-pic-icon" style="display: none;"></i>
+                            {% else %}
+                                <img id="profile-pic-img" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                                <i data-lucide="image" size="32" color="var(--gray-400)" id="profile-pic-icon"></i>
+                            {% endif %}
+                        </div>
+                        <div style="width: 100%; max-width: 300px; text-align: center;">
+                            <label class="form-label" style="font-weight: 500;">Profile Picture</label>
+                            {{ user_form.profile_picture }}
+                            {% if user_form.profile_picture.errors %}
+                                <div class="form-text" style="color: var(--danger);">{{ user_form.profile_picture.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-2" style="gap: 1.5rem; margin-bottom: 1.5rem;">
+                        <div>
+                            <label class="form-label" style="font-weight: 500;">First Name</label>
+                            {{ user_form.first_name }}
+                            {% if user_form.first_name.errors %}
+                                <div class="form-text" style="color: var(--danger);">{{ user_form.first_name.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="form-label" style="font-weight: 500;">Last Name</label>
+                            {{ user_form.last_name }}
+                            {% if user_form.last_name.errors %}
+                                <div class="form-text" style="color: var(--danger);">{{ user_form.last_name.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Contact Details -->
+                <div class="hb-card" style="padding: 2rem;">
+                    <h3 style="font-family: var(--font-display); font-size: 1.25rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--gray-200); padding-bottom: 0.75rem;">Contact Details</h3>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <label class="form-label" style="font-weight: 500;">Phone Number</label>
+                        {{ user_form.phone }}
+                        {% if user_form.phone.errors %}
+                            <div class="form-text" style="color: var(--danger);">{{ user_form.phone.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="grid grid-3" style="gap: 1.5rem; margin-bottom: 1.5rem;">
+                        <div>
+                            <label class="form-label" style="font-weight: 500;">City</label>
+                            {{ user_form.city }}
+                        </div>
+                        <div>
+                            <label class="form-label" style="font-weight: 500;">Country</label>
+                            {{ user_form.country }}
+                        </div>
+                        <div>
+                            <label class="form-label" style="font-weight: 500;">Pin Code</label>
+                            {{ user_form.pincode }}
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="form-label" style="font-weight: 500;">Full Address</label>
+                        {{ user_form.full_address }}
+                    </div>
+                </div>
+                
+                <!-- Section 3: Platform Preferences -->
+                <div class="hb-card" style="padding: 2rem;">
+                    <h3 style="font-family: var(--font-display); font-size: 1.25rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--gray-200); padding-bottom: 0.75rem;">How would you like to contribute?</h3>
+                    
+                    <div style="display: flex; gap: 2rem; flex-wrap: wrap; margin-bottom: 2rem; background: var(--gray-50); padding: 1.5rem; border-radius: 8px;">
+                        <div class="form-check">
+                            {{ pref_form.wants_to_donate }}
+                            <label class="form-check-label" style="font-weight: 500;">I want to donate</label>
+                        </div>
+                        <div class="form-check">
+                            {{ pref_form.wants_to_volunteer }}
+                            <label class="form-check-label" style="font-weight: 500;">I want to volunteer</label>
+                        </div>
+                        <div class="form-check">
+                            {{ pref_form.wants_to_manage }}
+                            <label class="form-check-label" style="font-weight: 500;">I want to manage drives</label>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-2" style="gap: 1.5rem; margin-bottom: 1.5rem;">
+                        <div>
+                            <label class="form-label" style="font-weight: 500;">Preferred Role in Platform</label>
+                            {{ pref_form.preferred_role }}
+                        </div>
+                        <div>
+                            <label class="form-label" style="font-weight: 500;">Social Work Experience</label>
+                            {{ pref_form.experience_level }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4: Skills & Availability -->
+                <div class="hb-card" style="padding: 2rem;">
+                    <h3 style="font-family: var(--font-display); font-size: 1.25rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--gray-200); padding-bottom: 0.75rem;">Skills & Availability</h3>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <label class="form-label" style="font-weight: 500;">My Skills (e.g. First Aid, Teaching, Event Planning)</label>
+                        {{ pref_form.skills }}
+                    </div>
+
+                    <div class="grid grid-2" style="gap: 1.5rem;">
+                        <div>
+                            <label class="form-label" style="font-weight: 500;">Availability (Days)</label>
+                            {{ pref_form.availability_days }}
+                        </div>
+                        <div>
+                            <label class="form-label" style="font-weight: 500;">Availability (Hours/Week)</label>
+                            {{ pref_form.availability_hours }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 5: Motivation & Goals -->
+                <div class="hb-card" style="padding: 2rem;">
+                    <h3 style="font-family: var(--font-display); font-size: 1.25rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--gray-200); padding-bottom: 0.75rem;">Motivation</h3>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <label class="form-label" style="font-weight: 500;">What motivates you to help?</label>
+                        {{ pref_form.motivation }}
+                    </div>
+                    
+                    <div>
+                        <label class="form-label" style="font-weight: 500;">What are your future goals with us?</label>
+                        {{ pref_form.future_goals }}
+                    </div>
+                </div>
+
+                <!-- Sticky Action Bar -->
+                <div style="position: sticky; bottom: 2rem; background: var(--white); padding: 1.5rem; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: flex; justify-content: flex-end; gap: 1rem; border: 1px solid var(--gray-200); z-index: 10;">
+                    <a href="{% url 'profile' %}" class="btn-outline-hb">Cancel</a>
+                    <button type="submit" class="btn-primary-hb">Save Changes</button>
+                </div>
+                
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const profileInput = document.querySelector('input[type="file"][name="profile_picture"]');
+        if (profileInput) {
+            profileInput.addEventListener('change', function(e) {
+                if (e.target.files && e.target.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const icon = document.getElementById('profile-pic-icon');
+                        const img = document.getElementById('profile-pic-img');
+                        if(icon) icon.style.display = 'none';
+                        if(img) {
+                            img.src = e.target.result;
+                            img.style.display = 'block';
+                        }
+                    }
+                    reader.readAsDataURL(e.target.files[0]);
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Donor Dashboard | HopeBridge{% endblock %}
+
+{% block content %}
+<div style="background: var(--gray-50); min-height: calc(100vh - 70px); padding: 3rem 0;">
+    <div class="container">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <h1 style="font-family: var(--font-display); font-size: 2.25rem; margin: 0;">Donor Dashboard</h1>
+                <p style="color: var(--gray-500); margin: 0.25rem 0 0 0;">Track your lifetime impact and allocations.</p>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <a href="{% url 'donations:my_donations' %}" class="btn-outline-hb">View History</a>
+                <a href="{% url 'donations:donate_view' %}" class="btn-primary-hb"><i data-lucide="heart" size="18"></i> Donate Now</a>
+            </div>
+        </div>
+
+        <!-- Top Overview Stats -->
+        <div class="grid grid-4" style="gap: 1.5rem; margin-bottom: 2.5rem;">
+            <!-- Lifetime Impact -->
+            <div class="hb-card hover-lift" style="padding: 1.5rem; border-top: 4px solid var(--primary);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <span style="color: var(--gray-500); font-size: 0.9rem; font-weight: 500; text-transform: uppercase;">Lifetime Impact</span>
+                    <div style="background: rgba(15,76,129,0.1); color: var(--primary); width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                        <i data-lucide="indian-rupee" size="20"></i>
+                    </div>
+                </div>
+                <h3 style="font-size: 2rem; margin: 0 0 0.25rem 0;">₹{{ total_amount|intcomma }}</h3>
+                <p style="color: var(--gray-500); font-size: 0.85rem; margin: 0;">Across {{ total_donations }} donations</p>
+            </div>
+
+            <!-- Active Allocations -->
+            <div class="hb-card hover-lift" style="padding: 1.5rem; border-top: 4px solid var(--accent);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <span style="color: var(--gray-500); font-size: 0.9rem; font-weight: 500; text-transform: uppercase;">Funds Utilized</span>
+                    <div style="background: rgba(15,157,88,0.1); color: var(--accent); width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                        <i data-lucide="activity" size="20"></i>
+                    </div>
+                </div>
+                <h3 style="font-size: 2rem; margin: 0 0 0.25rem 0;">₹{{ completed_allocations|intcomma }}</h3>
+                <p style="color: var(--gray-500); font-size: 0.85rem; margin: 0;">Actively utilized on ground</p>
+            </div>
+
+            <!-- Pending Allocations -->
+            <div class="hb-card hover-lift" style="padding: 1.5rem; border-top: 4px solid var(--secondary);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <span style="color: var(--gray-500); font-size: 0.9rem; font-weight: 500; text-transform: uppercase;">Pending Allocation</span>
+                    <div style="background: rgba(180,83,9,0.1); color: var(--secondary); width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                        <i data-lucide="clock" size="20"></i>
+                    </div>
+                </div>
+                <h3 style="font-size: 2rem; margin: 0 0 0.25rem 0;">₹{{ pending_allocations|intcomma }}</h3>
+                <p style="color: var(--gray-500); font-size: 0.85rem; margin: 0;">Awaiting drive mapping</p>
+            </div>
+
+            <!-- Gamification Metrics -->
+            <div class="hb-card hover-lift" style="padding: 1.5rem; border-top: 4px solid var(--success);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <span style="color: var(--gray-500); font-size: 0.9rem; font-weight: 500; text-transform: uppercase;">Impact Score</span>
+                    <div style="background: rgba(16,185,129,0.1); color: var(--success); width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                        <i data-lucide="zap" size="20"></i>
+                    </div>
+                </div>
+                <h3 style="font-size: 2rem; margin: 0 0 0.25rem 0;">{{ impact_score }}</h3>
+                <p style="color: var(--success); font-size: 0.85rem; margin: 0; font-weight: 500;">{{ streak }} Month Streak! 🔥</p>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+            <!-- Recent Donations List -->
+            <div class="hb-card" style="padding: 2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3 style="font-family: var(--font-display); font-size: 1.25rem; margin: 0;">Recent Contributions</h3>
+                    <a href="{% url 'donations:my_donations' %}" style="color: var(--primary); font-size: 0.9rem; font-weight: 500;">View All</a>
+                </div>
+                
+                {% if recent_donations %}
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    {% for donation in recent_donations %}
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border: 1px solid var(--gray-200); border-radius: 12px; transition: all 0.2s;" onmouseover="this.style.background='var(--gray-50)'; this.style.borderColor='var(--primary)'" onmouseout="this.style.background='transparent'; this.style.borderColor='var(--gray-200)'">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="background: rgba(15,76,129,0.1); color: var(--primary); width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <i data-lucide="gift" size="20"></i>
+                            </div>
+                            <div>
+                                <h4 style="margin: 0 0 0.25rem 0; font-size: 1.05rem;">{{ donation.get_donation_type_display }}</h4>
+                                <p style="margin: 0; font-size: 0.85rem; color: var(--gray-500);">Inv: {{ donation.invoice_number }} • {{ donation.date_donated|date:"d M Y" }}</p>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <p style="margin: 0 0 0.25rem 0; font-weight: 700; font-size: 1.1rem;">₹{{ donation.amount|intcomma }}</p>
+                            <a href="{% url 'donations:donation_detail' donation.id %}" style="font-size: 0.8rem; color: var(--primary); font-weight: 500;">Track Allocation →</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="icon-wrapper">
+                        <i data-lucide="inbox" size="32"></i>
+                    </div>
+                    <h4>No donations recorded yet</h4>
+                    <p>When you make your first contribution, it will appear here.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Side Widgets -->
+            <div style="display: flex; flex-direction: column; gap: 2rem;">
+                <div class="hb-card" style="padding: 1.5rem; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: var(--white);">
+                    <h3 style="font-family: var(--font-display); font-size: 1.25rem; margin-bottom: 1rem; color: var(--white);">Last Contribution</h3>
+                    {% if last_donation %}
+                        <p style="margin: 0 0 0.5rem 0; font-size: 1.5rem; font-weight: 700;">₹{{ last_donation.amount|intcomma }}</p>
+                        <p style="margin: 0 0 1rem 0; color: rgba(255,255,255,0.8); font-size: 0.9rem;">{{ last_donation.date_donated|timesince }} ago</p>
+                        <a href="{% url 'donations:donate_view' %}" class="btn-outline-hb btn-sm" style="color: var(--white); border-color: rgba(255,255,255,0.4); width: 100%; justify-content: center;">Donate Again</a>
+                    {% else %}
+                        <p style="margin: 0 0 1rem 0; color: rgba(255,255,255,0.8);">No contributions yet.</p>
+                        <a href="{% url 'donations:donate_view' %}" class="btn-secondary-hb btn-sm" style="width: 100%; justify-content: center;">Make First Donation</a>
+                    {% endif %}
+                </div>
+
+                <div class="hb-card" style="padding: 1.5rem;">
+                    <h3 style="font-family: var(--font-display); font-size: 1.1rem; margin-bottom: 1rem;">How tracking works</h3>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1rem;">
+                        <li style="display: flex; gap: 0.75rem;">
+                            <i data-lucide="check-circle" size="18" style="color: var(--primary); flex-shrink: 0;"></i>
+                            <span style="font-size: 0.9rem; color: var(--gray-600); line-height: 1.4;">Make a secure donation online.</span>
+                        </li>
+                        <li style="display: flex; gap: 0.75rem;">
+                            <i data-lucide="check-circle" size="18" style="color: var(--primary); flex-shrink: 0;"></i>
+                            <span style="font-size: 0.9rem; color: var(--gray-600); line-height: 1.4;">Funds sit in "Pending" until allocated to a drive.</span>
+                        </li>
+                        <li style="display: flex; gap: 0.75rem;">
+                            <i data-lucide="check-circle" size="18" style="color: var(--primary); flex-shrink: 0;"></i>
+                            <span style="font-size: 0.9rem; color: var(--gray-600); line-height: 1.4;">Track exactly which city/area your funds are used in via the Allocation Tracker.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

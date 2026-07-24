@@ -1,0 +1,52 @@
+{% extends 'custom_admin/base_admin.html' %}
+
+{% block page_title %}Campaigns & Drives{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: flex-end; margin-bottom: 1.5rem;">
+    <a href="{% url 'custom_admin:drive_create' %}" class="btn-primary-hb"><i data-lucide="plus" size="18" style="vertical-align: middle;"></i> Create New Drive</a>
+</div>
+
+<div class="admin-card" style="padding: 0; overflow: hidden;">
+    <table class="table-admin">
+        <thead>
+            <tr>
+                <th>Title & Location</th>
+                <th>Status</th>
+                <th>Budget (Allocated/Used)</th>
+                <th>Start Date</th>
+                <th style="text-align: right;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for drive in drives %}
+            <tr>
+                <td>
+                    <div style="font-weight: 600; color: var(--admin-primary);">{{ drive.title }}</div>
+                    <div style="font-size: 0.8rem; color: var(--gray-500);"><i data-lucide="map-pin" size="12"></i> {{ drive.location_city }}</div>
+                </td>
+                <td>
+                    <span class="badge {% if drive.status == 'active' %}badge-success{% elif drive.status == 'completed' %}badge-info{% else %}badge-warning{% endif %}">
+                        {{ drive.get_status_display }}
+                    </span>
+                </td>
+                <td>
+                    <div style="font-weight: 600;">₹{{ drive.budget_allocated }}</div>
+                    <div style="font-size: 0.8rem; color: var(--gray-500);">Used: ₹{{ drive.budget_used }}</div>
+                </td>
+                <td>{{ drive.start_date|date:"d M Y" }}</td>
+                <td style="text-align: right;">
+                    <a href="{% url 'custom_admin:drive_update' drive.id %}" class="btn-outline-hb btn-sm">Edit</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 2rem; color: var(--gray-500);">
+                    No campaigns or drives exist yet.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'custom_admin/base_admin.html' %}
+
+{% block page_title %}Donation Management{% endblock %}
+
+{% block content %}
+<div class="admin-card" style="padding: 0; overflow: hidden;">
+    <table class="table-admin">
+        <thead>
+            <tr>
+                <th>Invoice</th>
+                <th>Donor</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th style="text-align: right;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for don in donations %}
+            <tr>
+                <td><span style="font-family: monospace; font-weight: 600;">{{ don.invoice_number }}</span></td>
+                <td>
+                    <div style="font-weight: 600;">{{ don.name }}</div>
+                    <div style="font-size: 0.8rem; color: var(--gray-500);">{{ don.email }}</div>
+                </td>
+                <td style="font-weight: 700; color: var(--admin-primary);">₹{{ don.amount }}</td>
+                <td>{{ don.date_donated|date:"d M Y" }}</td>
+                <td>
+                    <span class="badge {% if don.payment_status == 'completed' %}badge-success{% elif don.payment_status == 'refunded' %}badge-danger{% else %}badge-warning{% endif %}">
+                        {{ don.payment_status|title }}
+                    </span>
+                </td>
+                <td style="text-align: right; display: flex; gap: 0.5rem; justify-content: flex-end;">
+                    {% if don.payment_status == 'completed' %}
+                        <a href="{% url 'custom_admin:allocate_donation' don.id %}" class="btn-primary-hb btn-sm" style="padding: 0.35rem 0.75rem;">Allocate Funds</a>
+                        <form method="post" action="{% url 'custom_admin:refund_donation' don.id %}" style="display:inline;" onsubmit="return confirm('Are you sure you want to mark this donation as refunded?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-outline-hb btn-sm" style="padding: 0.35rem 0.75rem; border-color: var(--danger); color: var(--danger);">Refund</button>
+                        </form>
+                    {% else %}
+                        <span style="color: var(--gray-400); font-size: 0.8rem;">No Actions</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" style="text-align: center; padding: 2rem;">No donations found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,221 @@
+{% extends 'volunteers/base_volunteer.html' %}
+{% load static %}
+
+{% block title %}Volunteer Dashboard — HopeBridge{% endblock %}
+
+{% block volunteer_css %}
+<style>
+    .journey-timeline {
+        position: relative;
+        padding-left: 2rem;
+        margin-top: 1.5rem;
+    }
+    
+    .journey-timeline::before {
+        content: '';
+        position: absolute;
+        left: 7px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: var(--gray-200);
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+    
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -2rem;
+        top: 5px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: var(--gray-300);
+        border: 4px solid var(--white);
+        box-shadow: 0 0 0 1px var(--gray-200);
+    }
+    
+    .timeline-item.completed::before {
+        background: var(--primary);
+        box-shadow: 0 0 0 1px var(--primary);
+    }
+    
+    .timeline-item.current::before {
+        background: var(--white);
+        border: 4px solid var(--primary);
+        box-shadow: 0 0 0 2px var(--primary-light);
+    }
+    
+    .progress-bar-container {
+        width: 100%;
+        height: 8px;
+        background: var(--gray-200);
+        border-radius: 4px;
+        overflow: hidden;
+        margin-top: 0.5rem;
+    }
+    
+    .progress-bar {
+        height: 100%;
+        background: var(--primary);
+        transition: width 0.5s ease;
+    }
+</style>
+{% endblock %}
+
+{% block volunteer_content %}
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+            <h2>👋 Welcome back, {{ user.first_name }}!</h2>
+            <a href="{% url 'volunteers:log_work' %}" class="btn-primary-hb btn-sm">Log Volunteer Hours</a>
+        </div>
+
+        <!-- Quick Stats Row -->
+        <div class="grid grid-3 animate-on-scroll" style="margin-bottom: 2rem;">
+            <div class="hb-card" style="text-align: center; padding: 1.5rem;">
+                <div style="background: rgba(108, 99, 255, 0.1); width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--primary);">
+                    <i data-lucide="clock"></i>
+                </div>
+                <h3 style="color: var(--dark-text); font-size: 1.8rem;">{{ total_hours }} <span style="font-size: 1rem; color: var(--gray-500);">hrs</span></h3>
+                <p style="color: var(--gray-500); font-size: 0.85rem; font-weight: 500;">Hours Completed</p>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="width: {{ total_hours|default:0 }}%;"></div>
+                </div>
+            </div>
+            <div class="hb-card" style="text-align: center; padding: 1.5rem;">
+                <div style="background: rgba(16, 185, 129, 0.1); width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--success);">
+                    <i data-lucide="briefcase"></i>
+                </div>
+                <h3 style="color: var(--dark-text); font-size: 1.8rem;">{{ assigned_drives.count }}</h3>
+                <p style="color: var(--gray-500); font-size: 0.85rem; font-weight: 500;">Assigned Drives</p>
+            </div>
+            <div class="hb-card" style="text-align: center; padding: 1.5rem;">
+                <div style="background: rgba(245, 158, 11, 0.1); width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--warning);">
+                    <i data-lucide="award"></i>
+                </div>
+                <h3 style="color: var(--dark-text); font-size: 1.8rem;">{{ certificates_count }}</h3>
+                <p style="color: var(--gray-500); font-size: 0.85rem; font-weight: 500;">Certificates Earned</p>
+            </div>
+        </div>
+
+        <div class="grid grid-2" style="gap: 2rem; align-items: start;">
+            <!-- Left: Volunteer Journey -->
+            <div class="hb-card">
+                <h4 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="map" size="20" style="color: var(--primary);"></i> Your Journey
+                </h4>
+                
+                {% if pending_applications %}
+                    {% for app in pending_applications %}
+                        <div style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--gray-200);">
+                            <h5 style="margin-bottom: 0.5rem;">Application: {{ app.drive.title }}</h5>
+                            <div class="journey-timeline">
+                                <div class="timeline-item completed">
+                                    <h6 style="margin: 0; font-size: 0.95rem;">Application Submitted</h6>
+                                    <p style="margin: 0; font-size: 0.8rem; color: var(--gray-500);">{{ app.joined_date|date:"M d, Y" }}</p>
+                                </div>
+                                <div class="timeline-item current">
+                                    <h6 style="margin: 0; font-size: 0.95rem; color: var(--primary);">Under Review</h6>
+                                    <p style="margin: 0; font-size: 0.8rem; color: var(--gray-500);">Admin is reviewing your application.</p>
+                                </div>
+                                <div class="timeline-item">
+                                    <h6 style="margin: 0; font-size: 0.95rem; color: var(--gray-400);">Approved & Assigned</h6>
+                                </div>
+                                <div class="timeline-item">
+                                    <h6 style="margin: 0; font-size: 0.95rem; color: var(--gray-400);">Drive Completed</h6>
+                                </div>
+                                <div class="timeline-item">
+                                    <h6 style="margin: 0; font-size: 0.95rem; color: var(--gray-400);">Certificate Issued</h6>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% elif assigned_drives %}
+                    {% for assoc in assigned_drives %}
+                        <div style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--gray-200);">
+                            <h5 style="margin-bottom: 0.5rem;">Active: {{ assoc.drive.title }}</h5>
+                            <div class="journey-timeline">
+                                <div class="timeline-item completed">
+                                    <h6 style="margin: 0; font-size: 0.95rem;">Application Approved</h6>
+                                </div>
+                                <div class="timeline-item current">
+                                    <h6 style="margin: 0; font-size: 0.95rem; color: var(--primary);">Assigned</h6>
+                                    <p style="margin: 0; font-size: 0.8rem; color: var(--gray-500);">You are currently working on this drive.</p>
+                                </div>
+                                <div class="timeline-item">
+                                    <h6 style="margin: 0; font-size: 0.95rem; color: var(--gray-400);">Drive Completed</h6>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <div class="icon-wrapper">
+                            <i data-lucide="compass" size="32"></i>
+                        </div>
+                        <h4>Start Your Journey</h4>
+                        <p>Apply for an upcoming drive to begin your volunteer journey.</p>
+                        <a href="{% url 'our_work' %}" class="btn-primary-hb btn-sm" style="display: inline-flex;">Find Drives</a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Right: Upcoming Events & Notifications -->
+            <div style="display: flex; flex-direction: column; gap: 2rem;">
+                
+                <!-- Upcoming Events -->
+                <div class="hb-card">
+                    <h4 style="margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between;">
+                        <span><i data-lucide="calendar" size="20" style="color: var(--secondary); vertical-align: middle; margin-right: 0.5rem;"></i> Upcoming Events</span>
+                        <a href="{% url 'volunteers:volunteer_calendar' %}" style="font-size: 0.85rem; color: var(--primary);">View All</a>
+                    </h4>
+                    
+                    {% if upcoming_events %}
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            {% for event in upcoming_events %}
+                                <div style="display: flex; gap: 1rem; align-items: center; padding: 0.75rem; background: var(--gray-50); border-radius: var(--radius-md); border-left: 4px solid var(--secondary);">
+                                    <div style="background: var(--white); padding: 0.5rem; text-align: center; border-radius: var(--radius-sm); min-width: 50px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                        <div style="font-size: 0.75rem; color: var(--error); font-weight: 700; text-transform: uppercase;">{{ event.date|date:"M" }}</div>
+                                        <div style="font-size: 1.2rem; font-weight: 800; color: var(--dark-text);">{{ event.date|date:"d" }}</div>
+                                    </div>
+                                    <div>
+                                        <h6 style="margin-bottom: 0.25rem;">{{ event.name }}</h6>
+                                        <p style="font-size: 0.8rem; color: var(--gray-500); margin: 0;"><i data-lucide="map-pin" size="14" style="vertical-align: middle;"></i> {{ event.location|default:"TBA" }}</p>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p style="color: var(--gray-400); font-size: 0.9rem;">No upcoming events scheduled.</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Notifications -->
+                <div class="hb-card">
+                    <h4 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i data-lucide="bell" size="20" style="color: var(--warning);"></i> Notifications
+                    </h4>
+                    
+                    {% if notifications %}
+                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                            {% for notif in notifications %}
+                                <div style="padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--gray-200); background: {% if not notif.is_read %}rgba(108, 99, 255, 0.05){% else %}var(--white){% endif %};">
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.25rem;">
+                                        <h6 style="margin: 0; font-size: 0.9rem;">{{ notif.title }}</h6>
+                                        <span style="font-size: 0.7rem; color: var(--gray-400);">{{ notif.created_at|timesince }} ago</span>
+                                    </div>
+                                    <p style="font-size: 0.85rem; color: var(--gray-600); margin: 0;">{{ notif.message }}</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p style="color: var(--gray-400); font-size: 0.9rem;">You have no new notifications.</p>
+                    {% endif %}
+                </div>
+                
+            </div>
+        </div>
+{% endblock %}

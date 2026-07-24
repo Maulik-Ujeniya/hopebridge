@@ -1,0 +1,55 @@
+{% extends 'volunteers/base_volunteer.html' %}
+{% load static %}
+
+{% block title %}Certificates — Volunteer Dashboard{% endblock %}
+
+{% block volunteer_content %}
+    <div style="margin-bottom: 2rem;">
+        <h2><i data-lucide="award" size="28" style="vertical-align: middle; color: var(--primary);"></i> My Certificates</h2>
+    </div>
+
+    {% if certificates %}
+        <div class="grid grid-3" style="gap: 1.5rem;">
+            {% for cert in certificates %}
+                <div class="hb-card animate-on-scroll" style="text-align: center; border: 2px solid var(--gray-200); position: relative; overflow: hidden;">
+                    <!-- Decorative Ribbon -->
+                    <div style="position: absolute; top: 0; right: 0; width: 60px; height: 60px; background: var(--secondary); clip-path: polygon(100% 0, 100% 100%, 0 0);"></div>
+                    <i data-lucide="award" style="color: var(--white); position: absolute; top: 8px; right: 8px; z-index: 10;" size="16"></i>
+
+                    <div style="margin-bottom: 1.5rem;">
+                        <i data-lucide="file-badge-2" size="48" style="color: var(--primary); opacity: 0.8;"></i>
+                    </div>
+                    
+                    <h4 style="margin-bottom: 0.5rem; font-size: 1.1rem; color: var(--dark-text);">{{ cert.title }}</h4>
+                    <p style="font-size: 0.85rem; color: var(--gray-500); margin-bottom: 1rem;">
+                        Issued: {{ cert.issue_date|date:"d M, Y" }}
+                    </p>
+                    
+                    {% if cert.drive %}
+                        <p style="font-size: 0.8rem; color: var(--gray-600); margin-bottom: 1.5rem; padding: 0.5rem; background: var(--gray-50); border-radius: var(--radius-sm);">
+                            Campaign: {{ cert.drive.title }}
+                        </p>
+                    {% elif cert.event %}
+                        <p style="font-size: 0.8rem; color: var(--gray-600); margin-bottom: 1.5rem; padding: 0.5rem; background: var(--gray-50); border-radius: var(--radius-sm);">
+                            Event: {{ cert.event.name }}
+                        </p>
+                    {% endif %}
+                    
+                    {% if cert.certificate_file %}
+                        <a href="{{ cert.certificate_file.url }}" download class="btn-primary-hb btn-sm" style="display: inline-block; width: 100%;"><i data-lucide="download" size="16" style="vertical-align: middle; margin-right: 0.5rem;"></i> Download</a>
+                    {% else %}
+                        <button class="btn-secondary-hb btn-sm" style="width: 100%; opacity: 0.5; cursor: not-allowed;" disabled><i data-lucide="file-question" size="16" style="vertical-align: middle; margin-right: 0.5rem;"></i> Processing...</button>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state animate-on-scroll">
+            <div class="icon-wrapper">
+                <i data-lucide="award" size="32"></i>
+            </div>
+            <h4>No Certificates Yet</h4>
+            <p>Complete your first assigned drive or event to earn a certificate of appreciation for your hard work!</p>
+            <a href="{% url 'our_work' %}" class="btn-primary-hb mt-2" style="display: inline-flex;">Find a Drive</a>
+        </div>
+{% endblock %}

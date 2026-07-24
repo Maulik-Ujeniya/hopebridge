@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Donor — HopeBridge{% endblock %}
+
+{% block content %}
+<div style="padding-top: 120px; padding-bottom: 4rem; max-width: 640px; margin: 0 auto; padding-left: 1.5rem; padding-right: 1.5rem;">
+    <div class="hb-card page-enter">
+        <h2 style="margin-bottom: 0.75rem;">Delete Donor</h2>
+        <p style="color: var(--gray-500); margin-bottom: 2rem;">Are you sure you want to delete {{ donor.name }}?</p>
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn-primary-hb" style="background: linear-gradient(135deg, #b91c1c, #7f1d1d);">Delete</button>
+            <a href="{% url 'donors:donor_detail' donor.id %}" class="btn-outline-hb" style="margin-left: 0.75rem;">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

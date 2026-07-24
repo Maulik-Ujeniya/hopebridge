@@ -1,0 +1,93 @@
+{% extends 'custom_admin/base_admin.html' %}
+
+{% block page_title %}Manage User: {{ managed_user.get_full_name|default:managed_user.email }}{% endblock %}
+
+{% block content %}
+<a href="{% url 'custom_admin:user_list' %}" style="display: inline-block; margin-bottom: 1.5rem; color: var(--gray-500); text-decoration: none; font-size: 0.9rem;">&larr; Back to Users</a>
+
+<div class="grid grid-2" style="gap: 1.5rem;">
+    <!-- Profile Card -->
+    <div class="admin-card">
+        <div style="display: flex; gap: 1.5rem; align-items: flex-start; margin-bottom: 2rem;">
+            <img src="{{ managed_user.profile_picture_url }}" alt="Profile" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--gray-200);">
+            <div>
+                <h3 style="margin: 0 0 0.25rem; color: var(--admin-primary);">{{ managed_user.get_full_name|default:managed_user.email }}</h3>
+                <p style="margin: 0 0 0.75rem; color: var(--gray-500);">{{ managed_user.email }}</p>
+                <span class="badge {% if managed_user.is_active %}badge-success{% else %}badge-danger{% endif %}">
+                    {% if managed_user.is_active %}Active{% else %}Suspended{% endif %}
+                </span>
+                <span class="badge badge-info">{{ managed_user.get_role_display }}</span>
+            </div>
+        </div>
+        
+        <form method="post" action="{% url 'custom_admin:assign_role' managed_user.id %}" style="padding-top: 1.5rem; border-top: 1px solid var(--gray-200);">
+            {% csrf_token %}
+            <h4 style="margin-top: 0; margin-bottom: 1rem; color: var(--admin-primary);">Role Management</h4>
+            <div style="display: flex; gap: 0.5rem;">
+                <select name="role" class="form-control" style="flex-grow: 1; padding: 0.5rem;">
+                    <option value="donor" {% if managed_user.role == 'donor' %}selected{% endif %}>Donor</option>
+                    <option value="volunteer" {% if managed_user.role == 'volunteer' %}selected{% endif %}>Volunteer</option>
+                    <option value="manager" {% if managed_user.role == 'manager' %}selected{% endif %}>Manager</option>
+                    <option value="admin" {% if managed_user.role == 'admin' %}selected{% endif %}>Admin</option>
+                </select>
+                <button type="submit" class="btn-primary-hb btn-sm">Update Role</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Stats & History -->
+    <div class="admin-card">
+        {% if managed_user.role == 'donor' %}
+            <h4 style="margin-top: 0; margin-bottom: 1rem; color: var(--admin-primary);">Donation History</h4>
+            <div style="overflow-x: auto; max-height: 300px;">
+                <table class="table-admin" style="font-size: 0.85rem;">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for don in donations %}
+                        <tr>
+                            <td>{{ don.date_donated|date:"d M Y" }}</td>
+                            <td style="font-weight: 600;">₹{{ don.amount }}</td>
+                            <td><span class="badge {% if don.payment_status == 'completed' %}badge-success{% else %}badge-warning{% endif %}">{{ don.payment_status }}</span></td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3" style="text-align: center; color: var(--gray-500);">No donations yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% elif managed_user.role == 'volunteer' %}
+            <h4 style="margin-top: 0; margin-bottom: 1rem; color: var(--admin-primary);">Volunteer Assignments</h4>
+            <div style="overflow-x: auto; max-height: 300px;">
+                <table class="table-admin" style="font-size: 0.85rem;">
+                    <thead>
+                        <tr>
+                            <th>Campaign</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for assoc in assignments %}
+                        <tr>
+                            <td>{{ assoc.drive.title }}</td>
+                            <td>{{ assoc.get_role_in_drive_display }}</td>
+                            <td><span class="badge badge-info">{{ assoc.get_status_display }}</span></td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3" style="text-align: center; color: var(--gray-500);">No assignments yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p style="color: var(--gray-500);">No specific history to show for this role.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

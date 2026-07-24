@@ -125,4 +125,8 @@ While this portal is fully functional, there are several ways it could be expand
 - **Real SMTP Email Integration:** Replace the console backend with a live email service for production.
 - **Role-Based Access Control:** Add different permission levels for staff, volunteers, and donors.
 - **PDF Export via Python:** Generate PDFs directly on the server (using libraries like `WeasyPrint` or `ReportLab`) instead of relying on the browser's print function.
+<<<<<<< HEAD
 - **REST API:** Build a RESTful API using Django Rest Framework (DRF) to serve data to mobile apps or front-end frameworks like React/Vue.
+=======
+- **REST API:** Build a RESTful API using Django Rest Framework (DRF) to serve data to mobile apps or front-end frameworks like React/Vue.
+>>>>>>> d28a72e (chore: save current HopeBridge project before system-wide refactoring)

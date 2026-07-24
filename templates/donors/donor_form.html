@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Donor Form — HopeBridge{% endblock %}
+
+{% block content %}
+<div class="pt-page pb-page page-enter" style="max-width: 720px; margin: 0 auto; padding-left: 1.5rem; padding-right: 1.5rem;">
+    <div class="hb-card">
+        <h2 style="margin-bottom: 1.5rem;">Donor Information</h2>
+        <form method="POST">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="hb-form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {{ field.errors }}
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn-primary-hb">Save Donor</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

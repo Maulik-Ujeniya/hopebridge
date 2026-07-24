@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ drive.title }} — HopeBridge{% endblock %}
+
+{% block content %}
+<div style="padding-top: 120px; padding-bottom: 6rem;" class="container page-enter">
+    <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 2rem;">
+        <a href="{% url 'drives:drive_list' %}" class="btn-outline-hb btn-sm">← Back to Campaigns</a>
+    </div>
+
+    <div class="grid grid-3" style="gap: 2rem; align-items: start;">
+        <!-- Left Panel: Main Info -->
+        <div style="grid-column: span 2; display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Main Details Card -->
+            <div class="hb-card">
+                <span style="font-size: 0.8rem; font-weight: 700; color: {{ drive.category.color|default:'#6C63FF' }}; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 0.5rem;">
+                    {{ drive.category.name|upper }} CAMPAIGN
+                </span>
+                <h1 style="font-size: 2.2rem; margin-bottom: 1rem; font-family: var(--font-display);">{{ drive.title }}</h1>
+                <p style="color: var(--gray-500); font-size: 0.95rem; margin-bottom: 2rem;">📍 {{ drive.location_address|default:drive.location_city }}</p>
+
+                <h4 style="color: var(--primary); margin-bottom: 0.75rem;">Description</h4>
+                <p style="color: var(--gray-700); line-height: 1.8; margin-bottom: 2rem; font-size: 1.05rem;">
+                    {{ drive.description }}
+                </p>
+
+                <!-- Impact Metrics -->
+                <div style="background: var(--gray-50); border-radius: var(--radius-md); padding: 1.5rem;">
+                    <h4 style="margin-bottom: 1rem;">Target Impact</h4>
+                    <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+                        <div>
+                            <span style="font-size: 0.8rem; color: var(--gray-500);">Target Beneficiaries</span>
+                            <p style="font-size: 1.5rem; font-weight: 800; color: var(--primary); margin-top: 0.25rem;">{{ drive.target_beneficiaries }}</p>
+                        </div>
+                        <div>
+                            <span style="font-size: 0.8rem; color: var(--gray-500);">Reached Beneficiaries</span>
+                            <p style="font-size: 1.5rem; font-weight: 800; color: var(--accent); margin-top: 0.25rem;">{{ drive.actual_beneficiaries }}</p>
+                        </div>
+                        <div>
+                            <span style="font-size: 0.8rem; color: var(--gray-500);">Budget Allocated</span>
+                            <p style="font-size: 1.5rem; font-weight: 800; color: var(--gray-800); margin-top: 0.25rem;">₹{{ drive.budget_allocated }}</p>
+                        </div>
+                    </div>
+                    <div style="margin-top: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.5rem; font-weight: 600;">
+                            <span>Completion status</span>
+                            <span>{{ drive.progress_percentage }}%</span>
+                        </div>
+                        <div class="hb-progress" style="height: 10px;">
+                            <div class="hb-progress-bar" style="width: {{ drive.progress_percentage }}%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Updates Timeline -->
+            <div class="hb-card">
+                <h3 style="margin-bottom: 1.5rem; font-family: var(--font-display);">📢 Campaign Updates</h3>
+                {% if updates %}
+                    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                        {% for update in updates %}
+                            <div style="border-left: 3px solid var(--primary); padding-left: 1.5rem; position: relative;">
+                                <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--primary); position: absolute; left: -8px; top: 6px;"></div>
+                                <h5 style="font-size: 1.1rem; margin-bottom: 0.25rem;">{{ update.title }}</h5>
+                                <p style="font-size: 0.8rem; color: var(--gray-400); margin-bottom: 0.5rem;">By {{ update.posted_by.get_full_name }} on {{ update.posted_at|date:"d M Y h:i A" }}</p>
+                                <p style="color: var(--gray-600); font-size: 0.95rem; line-height: 1.6;">{{ update.description }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p style="color: var(--gray-400); font-style: italic;">No updates have been posted for this campaign yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Right Panel: Actions & Coordinator -->
+        <div style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Volunteer Sign-up Card -->
+            <div class="hb-card" style="border-top: 4px solid var(--primary); text-align: center;">
+                <h4 style="margin-bottom: 0.5rem;">Volunteering</h4>
+                <p style="color: var(--gray-500); font-size: 0.85rem; margin-bottom: 1.5rem;">Help us in making an impact on the ground for this drive.</p>
+
+                {% if drive.status == 'active' %}
+                    {% if user.is_authenticated %}
+                        {% if is_joined %}
+                            <div style="background: rgba(16, 185, 129, 0.1); color: var(--success); padding: 0.85rem; border-radius: var(--radius-md); font-weight: 600; font-size: 0.9rem; margin-bottom: 1rem;">
+                                ✓ Registered Volunteer
+                            </div>
+                            <a href="{% url 'volunteers:volunteer_dashboard' %}" class="btn-primary-hb btn-sm" style="width: 100%; justify-content: center;">
+                                Go to My Dashboard
+                            </a>
+                        {% else %}
+                            <form method="POST" action="{% url 'drives:join_drive' drive.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-primary-hb btn-lg" style="width: 100%; justify-content: center;">
+                                    🤝 Join as Volunteer
+                                </button>
+                            </form>
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'login' %}?next={{ request.path }}" class="btn-primary-hb btn-lg" style="width: 100%; justify-content: center;">
+                            Login to Volunteer
+                        </a>
+                    {% endif %}
+                {% else %}
+                    <div style="background: var(--gray-100); color: var(--gray-500); padding: 0.85rem; border-radius: var(--radius-md); font-weight: 600; font-size: 0.9rem;">
+                        Drive: {{ drive.get_status_display }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Coordinator Information Card -->
+            <div class="hb-card">
+                <h4 style="margin-bottom: 1.5rem;">Campaign Manager</h4>
+                {% if drive.manager %}
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <img src="{{ drive.manager.profile_picture_url }}" alt="Profile" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
+                        <div>
+                            <h5 style="font-size: 1rem; font-family: var(--font-display);">{{ drive.manager.get_full_name }}</h5>
+                            <p style="font-size: 0.8rem; color: var(--gray-500);">HopeBridge Coordinator</p>
+                        </div>
+                    </div>
+                    <div style="margin-top: 1.5rem; border-top: 1px solid var(--gray-100); padding-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.85rem;">
+                        <span style="color: var(--gray-600);">📧 {{ drive.manager.email }}</span>
+                        <span style="color: var(--gray-600);">📞 {{ drive.manager.phone|default:"No phone listed" }}</span>
+                    </div>
+                {% else %}
+                    <p style="color: var(--gray-400); font-style: italic;">No manager assigned yet.</p>
+                {% endif %}
+            </div>
+
+            <!-- Active Volunteers List -->
+            <div class="hb-card">
+                <h4 style="margin-bottom: 1rem;">Volunteers Involved ({{ volunteers.count }})</h4>
+                {% if volunteers %}
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        {% for vol in volunteers %}
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <img src="{{ vol.volunteer.profile_picture_url }}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                                <span style="font-size: 0.9rem; font-weight: 500; color: var(--gray-800);">{{ vol.volunteer.get_full_name }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p style="color: var(--gray-400); font-size: 0.85rem; font-style: italic;">Be the first to volunteer for this drive!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

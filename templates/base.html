@@ -1,88 +1,371 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <title>HopeBridge</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="HopeBridge — Building Bridges of Hope. NGO Management System for donations, drives, events, and volunteer coordination.">
+    <meta name="theme-color" content="#0F0E17">
+    <title>{% block title %}{{ page_title|default:"HopeBridge — Building Bridges of Hope" }}{% endblock %}</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/animations.css' %}">
     <style>
-        html,
-        body {
-            height: 100%;
+        .nav-links a.active {
+            color: var(--white);
+            background: rgba(255, 255, 255, 0.15);
+            font-weight: 600;
         }
-
-        body {
+        .footer-social {
             display: flex;
-            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1rem;
         }
-
-        .main-content {
+        .footer-social a {
+            color: var(--gray-400);
+            transition: color 0.3s;
+        }
+        .footer-social a:hover {
+            color: var(--white);
+        }
+        .newsletter-form {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .newsletter-form input {
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--gray-600);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--white);
             flex: 1;
         }
+        .newsletter-form button {
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            border: none;
+            background: var(--primary);
+            color: var(--white);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .newsletter-form button:hover {
+            background: var(--primary-light);
+        }
+        .hb-navbar {
+            position: sticky;
+            top: 0;
+            z-index: 9999;
+        }
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                background: rgba(15, 23, 42, 0.98);
+                position: absolute;
+                top: 100%;
+                left: 0;
+                padding: 1rem;
+            }
+            .nav-links.show {
+                display: flex;
+            }
+            .nav-toggle {
+                display: block !important;
+            }
+        }
     </style>
+    {% block extra_css %}{% endblock %}
 </head>
-
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-        <div class="container">
-            <a class="navbar-brand" href="/">HopeBridge</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navMenu">
-                <div class="ms-auto d-flex flex-column flex-lg-row gap-2">
-                    <a class="btn btn-outline-light btn-sm" href="/donors/">Donors</a>
-                    <a class="btn btn-outline-light btn-sm" href="/volunteers/">Volunteers</a>
-                    <a class="btn btn-outline-light btn-sm" href="/events/">Events</a>
-                    <a class="btn btn-outline-light btn-sm" href="/programs/">Programs</a>
-                    <a class="btn btn-outline-light btn-sm" href="/donations/">Donations</a>
-                    <a class="btn btn-outline-light btn-sm" href="/admin/" target="_blank">Admin</a>
-                </div>
+    {% url 'home' as url_home %}
+    {% url 'about' as url_about %}
+    {% url 'our_work' as url_work %}
+    {% url 'gallery' as url_gallery %}
+    {% url 'contact' as url_contact %}
+
+    <!-- Navbar -->
+    <nav class="hb-navbar {% block navbar_class %}{% endblock %}">
+        <div class="nav-container">
+            <a href="{{ url_home }}" class="logo">
+                <span>HopeBridge</span>
+            </a>
+
+            <ul class="nav-links">
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'home' %}" class="{% if request.path == url_home %}active{% endif %}">Hub</a></li>
+                    
+                    {% if user.role == 'donor' or user.userpreference.wants_to_donate %}
+                        <li><a href="{% url 'donations:donor_dashboard' %}">Donor Dashboard</a></li>
+                        <li><a href="{% url 'donations:my_donations' %}">Donation History</a></li>
+                    {% endif %}
+                    
+                    {% if user.role == 'volunteer' or user.userpreference.wants_to_volunteer %}
+                        <li><a href="{% url 'volunteers:volunteer_dashboard' %}">Volunteer Hub</a></li>
+                    {% endif %}
+                    
+                    <li><a href="{% url 'our_work' %}" class="{% if request.path == url_work %}active{% endif %}">Drives</a></li>
+                {% else %}
+                    <li><a href="{{ url_home }}" class="{% if request.path == url_home %}active{% endif %}">Home</a></li>
+                    <li><a href="{{ url_about }}" class="{% if request.path == url_about %}active{% endif %}">About</a></li>
+                    <li><a href="{{ url_work }}" class="{% if request.path == url_work %}active{% endif %}">Our Work</a></li>
+                    <li><a href="{{ url_gallery }}" class="{% if request.path == url_gallery %}active{% endif %}">Gallery</a></li>
+                    <li><a href="{{ url_contact }}" class="{% if request.path == url_contact %}active{% endif %}">Contact</a></li>
+                {% endif %}
+            </ul>
+
+            <div class="nav-actions">
+                {% if user.is_authenticated %}
+                    <!-- Notification Bell -->
+                    <div style="position: relative;" class="notif-container">
+                        <button class="notification-bell" id="notifBtn" title="Notifications" style="background: none; border: none; cursor: pointer; color: var(--white); position: relative; display: flex; align-items: center;">
+                            <i data-lucide="bell"></i>
+                            <span class="badge" id="notifBadge" style="display: none; position: absolute; top: -5px; right: -8px; font-size: 0.65rem; padding: 0.15rem 0.35rem;">0</span>
+                        </button>
+                        
+                        <!-- Dropdown -->
+                        <div id="notifDropdown" class="hb-card" style="display: none; position: absolute; top: 100%; right: 0; width: 320px; padding: 0; margin-top: 1rem; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 10000; border: 1px solid var(--dark-border);">
+                            <div style="padding: 1rem; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center; background: var(--gray-50);">
+                                <h4 style="margin: 0; font-size: 1rem;">Notifications</h4>
+                                <button onclick="markAllRead()" style="background: none; border: none; color: var(--primary); font-size: 0.8rem; cursor: pointer;">Mark all read</button>
+                            </div>
+                            <div id="notifList" style="max-height: 350px; overflow-y: auto;">
+                                <!-- Populated by JS -->
+                            </div>
+                            <div style="padding: 0.75rem; border-top: 1px solid var(--gray-200); text-align: center; background: var(--gray-50);">
+                                <a href="{% url 'notifications:notification_list' %}" style="font-size: 0.85rem; color: var(--primary); font-weight: 600;">View All Notifications</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profile Dropdown / Dashboard -->
+                    {% if user.role == 'admin' %}
+                        <a href="{% url 'custom_admin:dashboard' %}" class="btn-primary-hb btn-sm">Admin Panel</a>
+                    {% else %}
+                        <a href="{% url 'profile' %}" class="btn-primary-hb btn-sm" title="My Profile"><i data-lucide="user"></i></a>
+                    {% endif %}
+                    <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-secondary-hb btn-sm" style="padding: 0.5rem;" title="Logout">
+                            <i data-lucide="log-out"></i>
+                        </button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'donations:donate_view' %}" class="btn-secondary-hb btn-sm">Donate</a>
+                    <a href="{% url 'login' %}?next={{ request.path }}" class="btn-secondary-hb btn-sm">Login</a>
+                {% endif %}
             </div>
+
+            <button class="nav-toggle" aria-label="Toggle menu" onclick="document.querySelector('.nav-links').classList.toggle('show')">
+                <i data-lucide="menu"></i>
+            </button>
         </div>
     </nav>
 
-    <div class="container main-content">
-        {% if messages %}
+    <!-- Flash Messages -->
+    {% if messages %}
+    <div id="flash-messages-container" style="position: fixed; top: 90px; right: 20px; z-index: 9999; max-width: 400px; display: flex; flex-direction: column; gap: 0.75rem;">
         {% for message in messages %}
-        <div class="alert alert-success">{{ message }}</div>
+        <div class="hb-alert hb-alert-{{ message.tags }} animate-on-scroll" style="box-shadow: var(--shadow-lg); display: flex; justify-content: space-between; align-items: center; border-left-width: 4px; opacity: 1; transform: translateY(0);">
+            <span>{{ message }}</span>
+            <button onclick="this.parentElement.remove()" style="background:none; border:none; color: inherit; opacity: 0.6; cursor: pointer; padding: 0 0 0 10px;"><i data-lucide="x" size="16"></i></button>
+        </div>
         {% endfor %}
-        {% endif %}
-        {% block content %}
-        {% endblock %}
     </div>
+    <script>
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(() => {
+            const container = document.getElementById('flash-messages-container');
+            if(container) {
+                container.style.transition = 'opacity 0.5s ease';
+                container.style.opacity = '0';
+                setTimeout(() => container.remove(), 500);
+            }
+        }, 5000);
+    </script>
+    {% endif %}
 
-    <footer class="bg-dark text-light mt-5 py-4">
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="hb-footer" style="background: var(--dark-bg); color: var(--gray-300); padding: 4rem 0 2rem; border-top: 1px solid var(--dark-border);">
         <div class="container">
-            <div class="row">
-                <div class="col-md-4 mb-3">
-                    <h5>HopeBridge NGO</h5>
-                    <p class="small">A portal dedicated to connecting donors, volunteers, and communities in need
-                        through transparent donation tracking and relief program management.</p>
+            <div class="grid grid-4" style="gap: 3rem;">
+                <!-- About Column -->
+                <div>
+                    <h5 style="font-size: 1.5rem; margin-bottom: 1rem; font-family: var(--font-display);">
+                        <span class="text-gradient">HopeBridge</span>
+                    </h5>
+                    <p style="font-size: 0.95rem; line-height: 1.8;">
+                        Empowering communities by connecting donors, volunteers, and those in need. Transparency and impact in every action.
+                    </p>
+                    <div class="footer-social">
+                        <a href="#"><i data-lucide="facebook"></i></a>
+                        <a href="#"><i data-lucide="twitter"></i></a>
+                        <a href="#"><i data-lucide="instagram"></i></a>
+                        <a href="#"><i data-lucide="linkedin"></i></a>
+                    </div>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <h5>Quick Links</h5>
-                    <ul class="list-unstyled small">
-                        <li><a href="/donors/" class="text-light">Donors</a></li>
-                        <li><a href="/volunteers/" class="text-light">Volunteers</a></li>
-                        <li><a href="/events/" class="text-light">Events</a></li>
-                        <li><a href="/programs/" class="text-light">Programs</a></li>
+                
+                <!-- Quick Links Column -->
+                <div>
+                    <h5 style="color: var(--white); margin-bottom: 1.5rem;">Quick Links</h5>
+                    <ul style="list-style: none; line-height: 2.5;">
+                        <li><a href="{{ url_about }}" style="color: var(--gray-400);">About Us</a></li>
+                        <li><a href="{{ url_work }}" style="color: var(--gray-400);">Our Impact</a></li>
+                        <li><a href="{{ url_gallery }}" style="color: var(--gray-400);">Gallery</a></li>
+                        <li><a href="{{ url_contact }}" style="color: var(--gray-400);">Contact</a></li>
                     </ul>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <h5>Contact Us</h5>
-                    <ul class="list-unstyled small">
-                        <li>Email: contact@hopebridge.org</li>
-                        <li>Phone: +91 98765 43210</li>
-                        <li>Address: Rajkot, Gujarat, India</li>
+                
+                <!-- Legal & Policy Column -->
+                <div>
+                    <h5 style="color: var(--white); margin-bottom: 1.5rem;">Legal</h5>
+                    <ul style="list-style: none; line-height: 2.5;">
+                        <li><a href="{% url 'terms' %}" style="color: var(--gray-400);">Terms of Service</a></li>
+                        <li><a href="{% url 'privacy' %}" style="color: var(--gray-400);">Privacy Policy</a></li>
+                        <li><a href="#" style="color: var(--gray-400);">Cookie Policy</a></li>
                     </ul>
+                </div>
+                
+                <!-- Newsletter & Contact -->
+                <div>
+                    <h5 style="color: var(--white); margin-bottom: 1.5rem;">Stay Updated</h5>
+                    <p style="font-size: 0.9rem; margin-bottom: 1rem;">Subscribe to our newsletter for the latest updates and impact reports.</p>
+                    <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Subscribed successfully!');">
+                        <input type="email" placeholder="Email address" required>
+                        <button type="submit"><i data-lucide="send" size="18"></i></button>
+                    </form>
+                    <div style="margin-top: 1.5rem; font-size: 0.9rem; line-height: 1.8;">
+                        <p><i data-lucide="mail" size="16" style="vertical-align: middle; margin-right: 8px;"></i> contact@hopebridge.org</p>
+                        <p><i data-lucide="phone" size="16" style="vertical-align: middle; margin-right: 8px;"></i> +91 98765 43210</p>
+                    </div>
                 </div>
             </div>
-            <hr class="border-secondary">
-            <p class="text-center small mb-0">© 2026 HopeBridge NGO Portal | Built for community impact</p>
+            
+            <div class="footer-bottom" style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); text-align: center; font-size: 0.9rem;">
+                <p>© {{ current_year|default:"2026" }} HopeBridge NGO. All rights reserved. Built with purpose.</p>
+            </div>
         </div>
     </footer>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
 
+    <!-- Scripts -->
+    <script src="{% static 'js/main.js' %}"></script>
+    <script>
+        lucide.createIcons();
+        
+        // Sticky Navbar effect on scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('.hb-navbar');
+            if (window.scrollY > 20) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+        
+        // Notification System
+        const notifBtn = document.getElementById('notifBtn');
+        const notifDropdown = document.getElementById('notifDropdown');
+        const notifBadge = document.getElementById('notifBadge');
+        const notifList = document.getElementById('notifList');
+        
+        if (notifBtn) {
+            notifBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                notifDropdown.style.display = notifDropdown.style.display === 'none' ? 'block' : 'none';
+                if (notifDropdown.style.display === 'block') {
+                    fetchNotifications();
+                }
+            });
+            
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.notif-container')) {
+                    notifDropdown.style.display = 'none';
+                }
+            });
+        }
+        
+        function fetchNotifications() {
+            fetch("{% url 'notifications:get_unread' %}")
+                .then(response => response.json())
+                .then(data => {
+                    if (data.count > 0) {
+                        notifBadge.style.display = 'block';
+                        notifBadge.textContent = data.count > 99 ? '99+' : data.count;
+                    } else {
+                        notifBadge.style.display = 'none';
+                    }
+                    
+                    if (data.notifications.length === 0) {
+                        notifList.innerHTML = '<div style="padding: 2rem 1rem; text-align: center; color: var(--gray-500); font-size: 0.9rem;">No unread notifications</div>';
+                        return;
+                    }
+                    
+                    let html = '';
+                    data.notifications.forEach(n => {
+                        html += `
+                            <div style="padding: 1rem; border-bottom: 1px solid var(--gray-100); cursor: pointer; transition: background 0.2s;" class="notif-item" onclick="markRead(${n.id}, '${n.link}')">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                                    <span style="font-size: 0.75rem; font-weight: 600; color: var(--primary); text-transform: uppercase;">${n.category}</span>
+                                    <span style="font-size: 0.75rem; color: var(--gray-400);">${n.time_ago}</span>
+                                </div>
+                                <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 0.25rem; color: var(--gray-800);">${n.title}</div>
+                                <div style="font-size: 0.85rem; color: var(--gray-600); line-height: 1.4;">${n.message}</div>
+                            </div>
+                        `;
+                    });
+                    notifList.innerHTML = html;
+                });
+        }
+        
+        function markRead(id, link) {
+            fetch(`/notifications/mark-read/${id}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            }).then(() => {
+                if (link && link !== 'None') {
+                    window.location.href = link;
+                } else {
+                    fetchNotifications();
+                }
+            });
+        }
+        
+        function markAllRead() {
+            fetch("{% url 'notifications:mark_all_read' %}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            }).then(() => {
+                fetchNotifications();
+            });
+        }
+        
+        // Initial fetch if logged in
+        if (notifBtn) {
+            fetchNotifications();
+            // Poll every 60 seconds
+            setInterval(fetchNotifications, 60000);
+        }
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
 </html>

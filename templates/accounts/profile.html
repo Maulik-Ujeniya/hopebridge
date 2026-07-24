@@ -1,0 +1,267 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}My Profile | HopeBridge{% endblock %}
+
+{% block content %}
+<div style="background: var(--gray-50); min-height: calc(100vh - 70px); padding: 3rem 0;">
+    <div class="container">
+        
+        <div style="display: grid; grid-template-columns: 1fr 2.5fr; gap: 2rem;">
+            
+            <!-- Left Column: Identity & Progress -->
+            <div style="display: flex; flex-direction: column; gap: 2rem;">
+                
+                <!-- Identity Card -->
+                <div class="hb-card" style="padding: 2rem; text-align: center;">
+                    <div style="position: relative; width: 120px; height: 120px; margin: 0 auto 1.5rem;">
+                        <img src="{{ profile_user.profile_picture_url }}" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 4px solid var(--white); box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                        <span style="position: absolute; bottom: 5px; right: 5px; background: var(--primary); color: var(--white); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--white);" title="Role: {{ profile_user.get_role_display }}">
+                            <i data-lucide="shield-check" size="16"></i>
+                        </span>
+                    </div>
+                    
+                    <h2 style="font-size: 1.5rem; margin-bottom: 0.25rem;">{{ profile_user.first_name }} {{ profile_user.last_name }}</h2>
+                    <p style="color: var(--gray-500); font-size: 0.95rem; margin-bottom: 1rem;">{{ profile_user.email }}</p>
+                    
+                    <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.5rem;">
+                        <span style="background: var(--gray-100); color: var(--gray-600); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; display: flex; align-items: center; gap: 0.25rem;">
+                            <i data-lucide="map-pin" size="14"></i>
+                            {% if profile_user.city %}{{ profile_user.city }}{% if profile_user.country %}, {{ profile_user.country }}{% endif %}{% else %}Location Unknown{% endif %}
+                        </span>
+                        <span style="background: var(--gray-100); color: var(--gray-600); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; display: flex; align-items: center; gap: 0.25rem;">
+                            <i data-lucide="calendar" size="14"></i>
+                            Joined {{ profile_user.date_joined|date:"M Y" }}
+                        </span>
+                    </div>
+                    
+                    <a href="{% url 'profile_edit' %}" class="btn-primary-hb" style="width: 100%; justify-content: center;">
+                        <i data-lucide="edit-3" size="16"></i> Edit Profile
+                    </a>
+                </div>
+
+                <!-- Completion Progress -->
+                <div class="hb-card" style="padding: 1.5rem;">
+                    <h3 style="font-size: 1.1rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between;">
+                        Profile Completion 
+                        <span style="color: var(--primary); font-weight: 700;">{{ completion_percentage }}%</span>
+                    </h3>
+                    <div style="width: 100%; background: var(--gray-200); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 1rem;">
+                        <div style="width: {{ completion_percentage }}%; background: var(--primary); height: 100%; border-radius: 4px; transition: width 0.5s ease;"></div>
+                    </div>
+                    {% if completion_percentage < 100 %}
+                    <p style="color: var(--gray-500); font-size: 0.85rem; margin: 0;">Complete your profile to unlock personalized recommendations and badges.</p>
+                    {% else %}
+                    <p style="color: var(--success); font-size: 0.85rem; margin: 0; display: flex; align-items: center; gap: 0.25rem;">
+                        <i data-lucide="check-circle" size="14"></i> Profile is fully complete!
+                    </p>
+                    {% endif %}
+                </div>
+
+                <!-- Contact Info Summary -->
+                <div class="hb-card" style="padding: 1.5rem;">
+                    <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Contact Details</h3>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.75rem;">
+                        <li style="display: flex; align-items: flex-start; gap: 0.75rem; color: var(--gray-600); font-size: 0.9rem;">
+                            <i data-lucide="phone" size="16" style="margin-top: 2px;"></i>
+                            <span>{{ profile_user.phone|default:"Not provided" }}</span>
+                        </li>
+                        <li style="display: flex; align-items: flex-start; gap: 0.75rem; color: var(--gray-600); font-size: 0.9rem;">
+                            <i data-lucide="map" size="16" style="margin-top: 2px;"></i>
+                            <span>
+                                {% if profile_user.full_address %}
+                                    {{ profile_user.full_address }}<br>
+                                    PIN: {{ profile_user.pincode }}
+                                {% else %}
+                                    Address not provided
+                                {% endif %}
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+                
+            </div>
+
+            <!-- Right Column: Stats & Preferences -->
+            <div style="display: flex; flex-direction: column; gap: 2rem;">
+                
+                <!-- Quick Stats Grid -->
+                <div class="grid grid-2" style="gap: 1.5rem;">
+                    <div class="hb-card" style="padding: 1.5rem; display: flex; align-items: center; gap: 1rem; border-left: 3px solid var(--accent);">
+                        <div style="background: rgba(15,157,88,0.1); color: var(--accent); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="indian-rupee" size="24"></i>
+                        </div>
+                        <div>
+                            <p style="color: var(--gray-500); font-size: 0.85rem; margin-bottom: 0.25rem;">Total Donated</p>
+                            <h3 style="margin: 0; font-size: 1.5rem;">₹{{ total_donated|intcomma }}</h3>
+                        </div>
+                    </div>
+                    <div class="hb-card" style="padding: 1.5rem; display: flex; align-items: center; gap: 1rem; border-left: 3px solid var(--secondary);">
+                        <div style="background: rgba(180,83,9,0.1); color: var(--secondary); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="clock" size="24"></i>
+                        </div>
+                        <div>
+                            <p style="color: var(--gray-500); font-size: 0.85rem; margin-bottom: 0.25rem;">Volunteer Hours</p>
+                            <h3 style="margin: 0; font-size: 1.5rem;">{{ total_hours }} hrs</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Donation Analytics (New section) -->
+                {% if request.user.role == 'donor' or total_donated > 0 %}
+                <div class="hb-card" style="padding: 1.5rem; background: var(--white); border: 1px solid var(--gray-200);">
+                    <h4 style="font-size: 1.05rem; margin-bottom: 1.25rem; color: var(--gray-800); border-bottom: 1px solid var(--gray-100); padding-bottom: 0.5rem;">Donation Analytics</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem;">
+                        <div>
+                            <p style="color: var(--gray-500); font-size: 0.8rem; margin: 0 0 0.25rem 0; text-transform: uppercase;">Favorite Category</p>
+                            <p style="font-weight: 700; color: var(--primary); font-size: 1.1rem; margin: 0;">{{ favorite_category|default:"N/A" }}</p>
+                        </div>
+                        <div>
+                            <p style="color: var(--gray-500); font-size: 0.8rem; margin: 0 0 0.25rem 0; text-transform: uppercase;">Average Donation</p>
+                            <p style="font-weight: 700; color: var(--gray-900); font-size: 1.1rem; margin: 0;">₹{{ average_donation|intcomma }}</p>
+                        </div>
+                        <div>
+                            <p style="color: var(--gray-500); font-size: 0.8rem; margin: 0 0 0.25rem 0; text-transform: uppercase;">Monthly Avg</p>
+                            <p style="font-weight: 700; color: var(--gray-900); font-size: 1.1rem; margin: 0;">₹{{ monthly_contribution|intcomma }}</p>
+                        </div>
+                        <div>
+                            <p style="color: var(--gray-500); font-size: 0.8rem; margin: 0 0 0.25rem 0; text-transform: uppercase;">Annual Total</p>
+                            <p style="font-weight: 700; color: var(--accent); font-size: 1.1rem; margin: 0;">₹{{ annual_contribution|intcomma }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Preferences & About -->
+                <div class="hb-card" style="padding: 2rem;">
+                    <h3 style="font-family: var(--font-display); font-size: 1.4rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--gray-200);">About & Preferences</h3>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                        <div>
+                            <h4 style="font-size: 0.95rem; color: var(--gray-500); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px;">I want to help by:</h4>
+                            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                {% if preferences.wants_to_donate %}
+                                <span style="background: rgba(15,76,129,0.1); color: var(--primary); padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.85rem; font-weight: 500;">Donating</span>
+                                {% endif %}
+                                {% if preferences.wants_to_volunteer %}
+                                <span style="background: rgba(15,157,88,0.1); color: var(--accent); padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.85rem; font-weight: 500;">Volunteering</span>
+                                {% endif %}
+                                {% if preferences.wants_to_manage %}
+                                <span style="background: rgba(180,83,9,0.1); color: var(--secondary); padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.85rem; font-weight: 500;">Managing Drives</span>
+                                {% endif %}
+                                {% if not preferences.wants_to_donate and not preferences.wants_to_volunteer and not preferences.wants_to_manage %}
+                                <span style="color: var(--gray-400); font-style: italic;">Not specified</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div>
+                            <h4 style="font-size: 0.95rem; color: var(--gray-500); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px;">Experience Level:</h4>
+                            <p style="margin: 0; font-weight: 500;">{{ preferences.get_experience_level_display|default:"Not specified" }}</p>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 1.5rem;">
+                        <h4 style="font-size: 0.95rem; color: var(--gray-500); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px;">My Skills</h4>
+                        <p style="color: var(--gray-700); line-height: 1.6; margin: 0;">
+                            {{ preferences.skills|default:"<span style='color: #9ca3af; font-style: italic;'>No skills added yet. Update your profile to help us match you with the right opportunities.</span>"|safe }}
+                        </p>
+                    </div>
+
+                    <div>
+                        <h4 style="font-size: 0.95rem; color: var(--gray-500); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px;">Motivation</h4>
+                        <p style="color: var(--gray-700); line-height: 1.6; margin: 0; padding: 1rem; background: var(--gray-50); border-left: 3px solid var(--primary); border-radius: 0 8px 8px 0;">
+                            "{{ preferences.motivation|default:"I want to make a difference in my community." }}"
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Recent Activity Tabs (Simplified to vertical list for modern feel) -->
+                <div class="hb-card" style="padding: 2rem;">
+                    <h3 style="font-family: var(--font-display); font-size: 1.4rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--gray-200);">Recent Activity</h3>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <!-- Donations -->
+                        <div>
+                            <h4 style="font-size: 1.05rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i data-lucide="gift" size="18" style="color: var(--primary);"></i> Recent Donations
+                            </h4>
+                            {% if recent_donations %}
+                                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                    {% for donation in recent_donations %}
+                                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: var(--gray-50); border-radius: 8px;">
+                                        <div>
+                                            <p style="margin: 0; font-weight: 500;">₹{{ donation.amount|intcomma }}</p>
+                                            <p style="margin: 0; font-size: 0.8rem; color: var(--gray-500);">{{ donation.date_donated|date:"M d, Y" }}</p>
+                                        </div>
+                                        <span style="background: rgba(16,185,129,0.1); color: var(--success); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">Completed</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p style="color: var(--gray-500); font-size: 0.9rem; margin: 0;">No donations yet.</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Volunteering -->
+                        <div>
+                            <h4 style="font-size: 1.05rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <i data-lucide="users" size="18" style="color: var(--accent);"></i> Recent Drives
+                            </h4>
+                            {% if recent_drives %}
+                                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                    {% for participation in recent_drives %}
+                                    <div style="padding: 0.75rem; background: var(--gray-50); border-radius: 8px;">
+                                        <p style="margin: 0 0 0.25rem 0; font-weight: 500;">{{ participation.drive.title }}</p>
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <p style="margin: 0; font-size: 0.8rem; color: var(--gray-500);">Role: {{ participation.get_role_in_drive_display }}</p>
+                                            <span style="background: var(--gray-200); color: var(--gray-700); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">{{ participation.get_status_display }}</span>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p style="color: var(--gray-500); font-size: 0.9rem; margin: 0;">No drive participations yet.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Certifications / Badges (Mocked for future backend support) -->
+                <div class="hb-card" style="padding: 2rem;">
+                    <h3 style="font-family: var(--font-display); font-size: 1.4rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--gray-200);">Achievements & Badges</h3>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        {% if total_donated > 0 %}
+                        <div style="background: rgba(15,76,129,0.05); border: 1px solid rgba(15,76,129,0.2); padding: 1rem; border-radius: 12px; text-align: center; width: 120px;">
+                            <i data-lucide="award" size="32" style="color: var(--primary); margin-bottom: 0.5rem;"></i>
+                            <p style="margin: 0; font-size: 0.8rem; font-weight: 600;">First Supporter</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if total_hours >= 10 %}
+                        <div style="background: rgba(15,157,88,0.05); border: 1px solid rgba(15,157,88,0.2); padding: 1rem; border-radius: 12px; text-align: center; width: 120px;">
+                            <i data-lucide="star" size="32" style="color: var(--accent); margin-bottom: 0.5rem;"></i>
+                            <p style="margin: 0; font-size: 0.8rem; font-weight: 600;">10+ Hours</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if completion_percentage == 100 %}
+                        <div style="background: rgba(180,83,9,0.05); border: 1px solid rgba(180,83,9,0.2); padding: 1rem; border-radius: 12px; text-align: center; width: 120px;">
+                            <i data-lucide="shield-check" size="32" style="color: var(--secondary); margin-bottom: 0.5rem;"></i>
+                            <p style="margin: 0; font-size: 0.8rem; font-weight: 600;">All-Star Profile</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if total_donated == 0 and total_hours == 0 and completion_percentage < 100 %}
+                        <p style="color: var(--gray-500); font-size: 0.9rem; margin: 0; width: 100%; text-align: center; padding: 2rem 0;">
+                            Start donating or volunteering to unlock badges!
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

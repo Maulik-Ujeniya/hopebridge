@@ -1,0 +1,40 @@
+{% extends 'custom_admin/base_admin.html' %}
+{% load static %}
+
+{% block page_title %}Send Announcements{% endblock %}
+
+{% block content %}
+    <div class="admin-card" style="max-width: 600px;">
+        <h2 style="margin-bottom: 0.5rem; color: var(--admin-primary);">📣 Send Announcements & Notifications</h2>
+        <p style="color: var(--gray-500); margin-bottom: 2rem;">Send system-wide broadcast updates or select specific users to notify.</p>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label for="target_role" style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Target Audience *</label>
+                <select name="target_role" id="target_role" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: 4px;" required>
+                    <option value="all">📣 Broadcast to All Registered Members</option>
+                    <option value="donor">Donors Only</option>
+                    <option value="volunteer">Volunteers Only</option>
+                    <option value="admin">Admins Only</option>
+                </select>
+            </div>
+
+            <div class="hb-form-group">
+                <label for="title">Title / Headline *</label>
+                <input type="text" name="title" id="title" class="hb-form-control" placeholder="e.g. New Food Drive Announcement" required>
+            </div>
+
+            <div class="hb-form-group">
+                <label for="message">Detailed Announcement Message *</label>
+                <textarea name="message" id="message" class="hb-form-control" rows="5" placeholder="Write updates, warnings, or targeted messages..." required></textarea>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <a href="{% url 'custom_admin:dashboard' %}" class="btn-outline-hb">Cancel</a>
+                <button type="submit" class="btn-primary-hb">Send Message</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

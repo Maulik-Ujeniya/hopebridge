@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Permission Denied — HopeBridge{% endblock %}
+{% block content %}
+<div style="padding-top: 140px; padding-bottom: 6rem; max-width: 550px; margin: 0 auto; padding-left: 1.5rem; padding-right: 1.5rem;">
+    <div class="hb-card page-enter" style="text-align: center; border-top: 5px solid var(--danger);">
+        <span style="font-size: 4.5rem; display: block; margin-bottom: 1rem; color: var(--danger);">403</span>
+        <h2 style="margin-bottom: 0.5rem; color: var(--gray-800);">Access Forbidden</h2>
+        <p style="color: var(--gray-600); line-height: 1.7; margin-bottom: 2rem;">
+            You do not have the necessary permissions to access this page. Please contact the administrator if you believe this is an error.
+        </p>
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+            <a href="{% url 'home' %}" class="btn-primary-hb">Back to Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

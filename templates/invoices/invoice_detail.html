@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Receipt {{ donation.invoice_number }} — HopeBridge{% endblock %}
+
+{% block extra_css %}
+<style>
+    @media print {
+        body {
+            background: white;
+            color: black;
+        }
+        .hb-navbar, .hb-footer, .no-print {
+            display: none !important;
+        }
+        .print-container {
+            padding: 0 !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+            border: none !important;
+            background: transparent !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 100px; padding-bottom: 4rem; max-width: 850px; margin: 0 auto; padding-left: 1.5rem; padding-right: 1.5rem;">
+    <!-- Actions Bar -->
+    <div class="no-print" style="display: flex; gap: 1rem; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap;">
+        <a href="{% url 'donations:my_donations' %}" class="btn-outline-hb btn-sm" style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="arrow-left" size="16"></i> Back to History</a>
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <button onclick="window.print()" class="btn-secondary-hb btn-sm" style="color: var(--gray-800); border-color: var(--gray-300); display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="printer" size="16"></i> Print Invoice</button>
+            <a href="{% url 'donations:resend_invoice' donation.id %}" class="btn-outline-hb btn-sm" style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="mail" size="16"></i> Email Again</a>
+            <a href="{% url 'invoices:download_invoice' donation.id %}" class="btn-primary-hb btn-sm" style="display: flex; align-items: center; gap: 0.5rem;"><i data-lucide="download" size="16"></i> Download PDF</a>
+        </div>
+    </div>
+
+    <!-- Invoice Card -->
+    <div class="hb-card print-container" id="printable-invoice" style="padding: 3.5rem; background: var(--white); box-shadow: var(--shadow-md); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); position: relative;">
+        
+        <!-- Watermark -->
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 8rem; color: rgba(0,0,0,0.02); font-weight: 900; z-index: 0; pointer-events: none; white-space: nowrap;">
+            HOPEBRIDGE NGO
+        </div>
+
+        <div style="position: relative; z-index: 1;">
+            <!-- Top row: Brand & Invoice info -->
+            <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 2rem; margin-bottom: 2.5rem; border-bottom: 3px solid var(--primary); padding-bottom: 1.5rem;">
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <div style="background: var(--primary); width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white;">
+                        <i data-lucide="heart-handshake" size="32"></i>
+                    </div>
+                    <div>
+                        <h3 style="color: var(--primary); font-size: 1.8rem; font-weight: 800; font-family: var(--font-display); margin: 0;">HopeBridge NGO</h3>
+                        <p style="color: var(--gray-500); font-size: 0.85rem; margin: 0.25rem 0 0 0; line-height: 1.4;">
+                            Rajkot, Gujarat, India - 360001<br>
+                            Email: contact@hopebridge.org<br>
+                            Phone: +91 98765 43210<br>
+                        </p>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <h4 style="color: var(--gray-900); font-size: 1.4rem; font-weight: 800; margin: 0; font-family: var(--font-display); text-transform: uppercase; letter-spacing: 1px;">Donation Receipt</h4>
+                    <p style="color: var(--gray-600); font-size: 0.9rem; margin: 0.5rem 0 0 0; line-height: 1.5;">
+                        <span style="display: inline-block; width: 80px; font-weight: 600;">Receipt No:</span> {{ donation.invoice_number }}<br>
+                        <span style="display: inline-block; width: 80px; font-weight: 600;">Date:</span> {{ donation.date_donated|date:"d M Y" }}<br>
+                        <span style="display: inline-block; width: 80px; font-weight: 600;">Status:</span> <span style="color: var(--success); font-weight: 700;">{{ donation.payment_status|upper }}</span><br>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Tax info & Donor info -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem;">
+                <div style="background: var(--gray-50); padding: 1.5rem; border-radius: 8px;">
+                    <h5 style="color: var(--gray-500); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 0.75rem 0;">Billed To / Donor Details</h5>
+                    <h4 style="color: var(--gray-900); font-size: 1.1rem; font-weight: 700; margin: 0 0 0.5rem 0;">{{ donation.name }}</h4>
+                    <p style="color: var(--gray-600); font-size: 0.9rem; line-height: 1.5; margin: 0;">
+                        {% if donation.email %}{{ donation.email }}<br>{% endif %}
+                        {% if donation.phone %}{{ donation.phone }}<br>{% endif %}
+                        {% if donation.full_address %}{{ donation.full_address }}<br>{% endif %}
+                        {% if donation.city or donation.country %}{{ donation.city|default:"" }}, {{ donation.country|default:"" }} - {{ donation.pincode|default:"" }}{% endif %}
+                    </p>
+                </div>
+                <div style="padding: 1.5rem; border: 1px solid var(--gray-200); border-radius: 8px; display: flex; flex-direction: column; justify-content: center;">
+                    <h5 style="color: var(--gray-500); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 0.75rem 0;">Organization Tax Info</h5>
+                    <p style="color: var(--gray-600); font-size: 0.9rem; line-height: 1.6; margin: 0;">
+                        <span style="display: inline-block; width: 100px; font-weight: 600;">NGO Reg No:</span> HB-NGO-2026-GJ<br>
+                        <span style="display: inline-block; width: 100px; font-weight: 600;">PAN Number:</span> AABCD1234E<br>
+                        <span style="display: inline-block; width: 100px; font-weight: 600;">80G Reg No:</span> 80G/HB/2026<br>
+                    </p>
+                    <div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed var(--gray-200); font-size: 0.8rem; color: var(--success); font-weight: 600;">
+                        ✓ Eligible for tax exemption under Sec 80G
+                    </div>
+                </div>
+            </div>
+
+            <!-- Details Table -->
+            <div style="margin-bottom: 2rem;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem;">
+                    <thead>
+                        <tr style="background: var(--primary); color: white;">
+                            <th style="padding: 1rem 1.5rem; font-weight: 600; border-radius: 8px 0 0 0;">Description</th>
+                            <th style="padding: 1rem 1.5rem; font-weight: 600;">Transaction Ref</th>
+                            <th style="padding: 1rem 1.5rem; font-weight: 600;">Method</th>
+                            <th style="padding: 1rem 1.5rem; font-weight: 600; text-align: right; border-radius: 0 8px 0 0;">Amount (INR)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid var(--gray-200);">
+                            <td style="padding: 1.5rem; color: var(--gray-800); font-weight: 500;">
+                                Contribution towards {{ donation.get_donation_type_display }}
+                                {% if donation.quantity %}<br><span style="font-size: 0.85rem; color: var(--gray-500); font-weight: 400;">Specs: {{ donation.quantity }}</span>{% endif %}
+                            </td>
+                            <td style="padding: 1.5rem; color: var(--gray-600); font-family: monospace;">{{ donation.transaction_id|default:"N/A" }}</td>
+                            <td style="padding: 1.5rem; color: var(--gray-600);">{{ donation.get_payment_method_display }}</td>
+                            <td style="padding: 1.5rem; text-align: right; font-weight: 700; color: var(--gray-900);">₹{{ donation.amount|intcomma }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Totals & Signature -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 4rem;">
+                
+                <!-- QR & Digital Sig -->
+                <div style="display: flex; gap: 2rem; align-items: center;">
+                    <!-- Mock QR Code -->
+                    <div style="width: 100px; height: 100px; background: white; border: 2px solid var(--gray-200); padding: 0.25rem; display: flex; align-items: center; justify-content: center; opacity: 0.5;">
+                        <i data-lucide="qr-code" size="64" color="var(--gray-400)"></i>
+                    </div>
+                    <div>
+                        <p style="margin: 0 0 1rem 0; font-family: 'Brush Script MT', cursive, serif; font-size: 2rem; color: var(--primary);">Dr. Arjun Mehta</p>
+                        <div style="border-top: 1px solid var(--gray-300); padding-top: 0.25rem;">
+                            <p style="margin: 0; font-size: 0.8rem; font-weight: 600; color: var(--gray-700);">Authorized Signatory</p>
+                            <p style="margin: 0; font-size: 0.75rem; color: var(--gray-500);">HopeBridge Finance Dept.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total block -->
+                <div style="width: 300px;">
+                    <div style="display: flex; justify-content: space-between; padding: 0.5rem 1.5rem; color: var(--gray-600);">
+                        <span>Subtotal:</span>
+                        <span>₹{{ donation.amount|intcomma }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 0.5rem 1.5rem; color: var(--gray-600);">
+                        <span>Processing Fee:</span>
+                        <span>₹0.00</span>
+                    </div>
+                    <div style="background: var(--gray-50); border-top: 2px solid var(--primary); padding: 1.5rem; margin-top: 0.5rem; border-radius: 0 0 8px 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-weight: 700; color: var(--gray-800); font-size: 1.1rem; text-transform: uppercase;">Total Received:</span>
+                            <span style="font-weight: 800; color: var(--primary); font-size: 1.5rem;">₹{{ donation.amount|intcomma }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div style="text-align: center; border-top: 1px solid var(--gray-200); padding-top: 2rem; color: var(--gray-500); font-size: 0.85rem; line-height: 1.6;">
+                <p style="margin-bottom: 0.5rem; color: var(--gray-700); font-weight: 600;">Your contribution makes a direct difference in our ongoing drives.</p>
+                <p style="margin: 0;">This is a computer-generated document. No physical signature is required for validity.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

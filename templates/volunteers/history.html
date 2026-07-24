@@ -1,0 +1,71 @@
+{% extends 'volunteers/base_volunteer.html' %}
+{% load static %}
+
+{% block title %}Volunteer History — HopeBridge{% endblock %}
+
+{% block volunteer_content %}
+    <div style="margin-bottom: 2rem;">
+        <h2><i data-lucide="history" size="28" style="vertical-align: middle; color: var(--primary);"></i> History & Logs</h2>
+    </div>
+
+    <div class="grid grid-2" style="gap: 2rem;">
+        <!-- Completed Drives -->
+        <div class="hb-card animate-on-scroll">
+            <h4 style="margin-bottom: 1.5rem;">Completed Campaigns</h4>
+            {% if completed_drives %}
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    {% for assoc in completed_drives %}
+                        <div style="padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--gray-200); background: var(--gray-50); display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h5 style="margin-bottom: 0.25rem;">{{ assoc.drive.title }}</h5>
+                                <span style="font-size: 0.8rem; color: var(--gray-500);">Role: {{ assoc.get_role_in_drive_display }}</span>
+                            </div>
+                            <span class="status-badge" style="background: rgba(16, 185, 129, 0.1); color: var(--success); font-size: 0.75rem;">Completed</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p style="color: var(--gray-400); font-size: 0.9rem; font-style: italic;">No completed campaigns yet.</p>
+            {% endif %}
+        </div>
+
+        <!-- Work Logs -->
+        <div class="hb-card animate-on-scroll" style="animation-delay: 0.1s;">
+            <h4 style="margin-bottom: 1.5rem;">Hours Logged</h4>
+            {% if work_logs %}
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--gray-200); text-align: left;">
+                                <th style="padding: 0.75rem 0.5rem; color: var(--gray-600);">Date</th>
+                                <th style="padding: 0.75rem 0.5rem; color: var(--gray-600);">Campaign</th>
+                                <th style="padding: 0.75rem 0.5rem; color: var(--gray-600);">Hours</th>
+                                <th style="padding: 0.75rem 0.5rem; color: var(--gray-600); text-align: right;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in work_logs %}
+                                <tr style="border-bottom: 1px solid var(--gray-100);">
+                                    <td style="padding: 0.75rem 0.5rem; color: var(--gray-700);">{{ log.date|date:"d M Y" }}</td>
+                                    <td style="padding: 0.75rem 0.5rem; font-weight: 500;">
+                                        <a href="{% url 'drives:drive_detail' log.drive.id %}">{{ log.drive.title|truncatewords:4 }}</a>
+                                    </td>
+                                    <td style="padding: 0.75rem 0.5rem; font-weight: 600; color: var(--primary);">{{ log.hours_worked }} hrs</td>
+                                    <td style="padding: 0.75rem 0.5rem; text-align: right;">
+                                        {% if log.verified %}
+                                            <span style="color: var(--success); font-weight: 600; font-size: 0.8rem;">Verified</span>
+                                        {% else %}
+                                            <span style="color: var(--warning); font-weight: 600; font-size: 0.8rem;">Pending</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p style="color: var(--gray-400); font-style: italic;">No volunteer hours logged yet.</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends 'custom_admin/base_admin.html' %}
+
+{% block page_title %}Organization Settings{% endblock %}
+
+{% block content %}
+<div class="admin-card" style="max-width: 800px;">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <h4 style="margin-top: 0; margin-bottom: 1.5rem; color: var(--admin-primary); border-bottom: 1px solid var(--gray-200); padding-bottom: 0.5rem;">General Information</h4>
+        
+        <div class="grid grid-2" style="gap: 1.5rem; margin-bottom: 1.5rem;">
+            <div class="form-group">
+                <label for="name" style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Organization Name</label>
+                <input type="text" id="name" name="name" value="{{ settings.name }}" required class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: 4px;">
+            </div>
+            <div class="form-group">
+                <label for="legal_name" style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Legal Name (For Tax Receipts)</label>
+                <input type="text" id="legal_name" name="legal_name" value="{{ settings.legal_name }}" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: 4px;">
+            </div>
+        </div>
+        
+        <div class="grid grid-2" style="gap: 1.5rem; margin-bottom: 1.5rem;">
+            <div class="form-group">
+                <label for="contact_email" style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Contact Email</label>
+                <input type="email" id="contact_email" name="contact_email" value="{{ settings.contact_email }}" required class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: 4px;">
+            </div>
+            <div class="form-group">
+                <label for="contact_phone" style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Contact Phone</label>
+                <input type="text" id="contact_phone" name="contact_phone" value="{{ settings.contact_phone }}" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: 4px;">
+            </div>
+        </div>
+        
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label for="address" style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Headquarters Address</label>
+            <textarea id="address" name="address" rows="3" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: 4px;">{{ settings.address }}</textarea>
+        </div>
+        
+        <div class="form-group" style="margin-bottom: 2rem;">
+            <label for="tax_id" style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Tax Registration ID (e.g. 80G)</label>
+            <input type="text" id="tax_id" name="tax_id" value="{{ settings.tax_id }}" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: 4px;">
+        </div>
+        
+        <h4 style="margin-top: 2rem; margin-bottom: 1.5rem; color: var(--admin-primary); border-bottom: 1px solid var(--gray-200); padding-bottom: 0.5rem;">Branding</h4>
+        
+        <div class="form-group" style="margin-bottom: 2rem;">
+            <label for="logo" style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Organization Logo</label>
+            <input type="file" id="logo" name="logo" accept="image/*" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: 4px; background: var(--gray-50);">
+            {% if settings.logo %}
+                <p style="font-size: 0.8rem; color: var(--gray-500); margin-top: 0.5rem;">Current: <a href="{{ settings.logo.url }}" target="_blank">View Logo</a></p>
+            {% endif %}
+        </div>
+        
+        <button type="submit" class="btn-primary-hb">Save Settings</button>
+    </form>
+</div>
+{% endblock %}

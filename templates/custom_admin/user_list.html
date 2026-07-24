@@ -1,0 +1,78 @@
+{% extends 'custom_admin/base_admin.html' %}
+
+{% block page_title %}User Management{% endblock %}
+
+{% block content %}
+<div class="admin-card" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        <h3 style="margin: 0; color: var(--admin-primary);">All Members</h3>
+        <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: var(--gray-500);">Manage roles, status, and view profiles.</p>
+    </div>
+    
+    <form method="get" style="display: flex; gap: 0.5rem; align-items: center;">
+        <select name="role" class="form-control" style="padding: 0.5rem; border-radius: var(--radius-sm); border: 1px solid var(--gray-300);">
+            <option value="">All Roles</option>
+            <option value="donor" {% if role_filter == 'donor' %}selected{% endif %}>Donors</option>
+            <option value="volunteer" {% if role_filter == 'volunteer' %}selected{% endif %}>Volunteers</option>
+            <option value="admin" {% if role_filter == 'admin' %}selected{% endif %}>Admins</option>
+        </select>
+        <button type="submit" class="btn-primary-hb btn-sm" style="padding: 0.5rem 1rem;">Filter</button>
+    </form>
+</div>
+
+<div class="admin-card" style="padding: 0; overflow: hidden;">
+    <table class="table-admin">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Role</th>
+                <th>Joined</th>
+                <th>Status</th>
+                <th style="text-align: right;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in users %}
+            <tr>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <img src="{{ u.profile_picture_url }}" alt="Profile" style="width: 40px; height: 40px; border-radius: 50%;">
+                        <div>
+                            <div style="font-weight: 600; color: var(--admin-primary);">{{ u.get_full_name|default:u.email }}</div>
+                            <div style="font-size: 0.8rem; color: var(--gray-500);">{{ u.email }}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <span class="badge {% if u.role == 'admin' %}badge-danger{% elif u.role == 'volunteer' %}badge-info{% else %}badge-success{% endif %}">
+                        {{ u.get_role_display }}
+                    </span>
+                </td>
+                <td style="color: var(--gray-600); font-size: 0.9rem;">{{ u.date_joined|date:"d M Y" }}</td>
+                <td>
+                    {% if u.is_active %}
+                        <span class="badge badge-success">Active</span>
+                    {% else %}
+                        <span class="badge badge-danger">Suspended</span>
+                    {% endif %}
+                </td>
+                <td style="text-align: right; display: flex; gap: 0.5rem; justify-content: flex-end;">
+                    <a href="{% url 'custom_admin:user_detail' u.id %}" class="btn-outline-hb btn-sm" style="padding: 0.35rem 0.75rem;">Manage</a>
+                    {% if u != user %}
+                        <a href="{% url 'custom_admin:toggle_user_status' u.id %}" class="btn-outline-hb btn-sm" style="padding: 0.35rem 0.75rem; border-color: {% if u.is_active %}var(--danger){% else %}var(--success){% endif %}; color: {% if u.is_active %}var(--danger){% else %}var(--success){% endif %};">
+                            {% if u.is_active %}Suspend{% else %}Activate{% endif %}
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 2rem; color: var(--gray-500);">
+                    No users found matching the criteria.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Donation History | HopeBridge{% endblock %}
+
+{% block content %}
+<div style="background: var(--gray-50); min-height: calc(100vh - 70px); padding: 3rem 0;">
+    <div class="container" style="max-width: 1100px;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <a href="{% url 'donations:donor_dashboard' %}" style="display: inline-flex; align-items: center; gap: 0.5rem; color: var(--gray-500); font-size: 0.9rem; margin-bottom: 0.5rem; text-decoration: none;">
+                    <i data-lucide="arrow-left" size="14"></i> Back to Dashboard
+                </a>
+                <h1 style="font-family: var(--font-display); font-size: 2.25rem; margin: 0;">Donation History</h1>
+            </div>
+            <a href="{% url 'donations:donate_view' %}" class="btn-primary-hb">Make New Donation</a>
+        </div>
+
+        <!-- Filters -->
+        <div class="hb-card" style="padding: 1.5rem; margin-bottom: 2rem;">
+            <form method="get" action="" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end;">
+                <div style="flex: 1; min-width: 150px;">
+                    <label class="form-label" style="font-size: 0.85rem;">Status</label>
+                    <select name="status" class="form-select" style="padding: 0.5rem;">
+                        <option value="">All Statuses</option>
+                        <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Completed</option>
+                        <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="failed" {% if request.GET.status == 'failed' %}selected{% endif %}>Failed</option>
+                    </select>
+                </div>
+                <div style="flex: 1; min-width: 150px;">
+                    <label class="form-label" style="font-size: 0.85rem;">Category</label>
+                    <select name="category" class="form-select" style="padding: 0.5rem;">
+                        <option value="">All Categories</option>
+                        <option value="general" {% if request.GET.category == 'general' %}selected{% endif %}>General Fund</option>
+                        <option value="food" {% if request.GET.category == 'food' %}selected{% endif %}>Food Drive</option>
+                        <option value="health" {% if request.GET.category == 'health' %}selected{% endif %}>Medical / Healthcare</option>
+                        <option value="education" {% if request.GET.category == 'education' %}selected{% endif %}>Education</option>
+                        <option value="disaster" {% if request.GET.category == 'disaster' %}selected{% endif %}>Disaster Relief</option>
+                    </select>
+                </div>
+                <div style="flex: 1; min-width: 150px;">
+                    <label class="form-label" style="font-size: 0.85rem;">From Date</label>
+                    <input type="date" name="date_from" class="form-control" style="padding: 0.5rem;" value="{{ request.GET.date_from }}">
+                </div>
+                <div style="flex: 1; min-width: 150px;">
+                    <label class="form-label" style="font-size: 0.85rem;">To Date</label>
+                    <input type="date" name="date_to" class="form-control" style="padding: 0.5rem;" value="{{ request.GET.date_to }}">
+                </div>
+                <div>
+                    <button type="submit" class="btn-primary-hb" style="padding: 0.6rem 1.25rem;">Filter</button>
+                    {% if request.GET %}
+                        <a href="{% url 'donations:my_donations' %}" class="btn-outline-hb" style="padding: 0.6rem 1.25rem; margin-left: 0.5rem;">Clear</a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+
+        <div class="hb-card">
+            {% if donations %}
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; min-width: 800px;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--gray-200); text-align: left; background: var(--gray-50);">
+                                <th style="padding: 1rem 1.5rem; color: var(--gray-600); font-weight: 600; font-size: 0.9rem;">Date</th>
+                                <th style="padding: 1rem; color: var(--gray-600); font-weight: 600; font-size: 0.9rem;">Invoice No</th>
+                                <th style="padding: 1rem; color: var(--gray-600); font-weight: 600; font-size: 0.9rem;">Category</th>
+                                <th style="padding: 1rem; color: var(--gray-600); font-weight: 600; font-size: 0.9rem;">Amount</th>
+                                <th style="padding: 1rem; color: var(--gray-600); font-weight: 600; font-size: 0.9rem;">Status</th>
+                                <th style="padding: 1rem 1.5rem; color: var(--gray-600); font-weight: 600; font-size: 0.9rem; text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for donation in donations %}
+                                <tr style="border-bottom: 1px solid var(--gray-100); transition: background 0.2s;" onmouseover="this.style.background='var(--gray-50)'" onmouseout="this.style.background='transparent'">
+                                    <td style="padding: 1rem 1.5rem; color: var(--gray-700); font-size: 0.95rem;">{{ donation.date_donated|date:"d M Y" }}</td>
+                                    <td style="padding: 1rem; font-weight: 600; color: var(--primary); font-family: monospace;">{{ donation.invoice_number }}</td>
+                                    <td style="padding: 1rem; color: var(--gray-700); font-size: 0.95rem;">
+                                        <span style="display: inline-block; padding: 0.25rem 0.5rem; background: var(--gray-100); border-radius: 4px; font-size: 0.85rem;">{{ donation.get_donation_type_display }}</span>
+                                    </td>
+                                    <td style="padding: 1rem; font-weight: 700; color: var(--gray-900);">₹{{ donation.amount|intcomma }}</td>
+                                    <td style="padding: 1rem;">
+                                        {% if donation.payment_status == 'completed' %}
+                                            <span style="color: var(--success); font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 0.25rem;"><i data-lucide="check-circle" size="14"></i> Completed</span>
+                                        {% elif donation.payment_status == 'pending' %}
+                                            <span style="color: var(--secondary); font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 0.25rem;"><i data-lucide="clock" size="14"></i> Pending</span>
+                                        {% else %}
+                                            <span style="color: var(--danger); font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 0.25rem;"><i data-lucide="x-circle" size="14"></i> Failed</span>
+                                        {% endif %}
+                                    </td>
+                                    <td style="padding: 1rem 1.5rem; text-align: right;">
+                                        <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                                            {% if donation.payment_status == 'completed' %}
+                                                <a href="{% url 'donations:donation_detail' donation.id %}" class="btn-outline-hb btn-sm" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; border-color: var(--primary); color: var(--primary);">Track</a>
+                                                <a href="{% url 'invoices:view_invoice' donation.id %}" class="btn-outline-hb btn-sm" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Invoice</a>
+                                            {% else %}
+                                                <span style="color: var(--gray-400); font-size: 0.85rem;">No actions available</span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="icon-wrapper">
+                        <i data-lucide="search-x" size="32"></i>
+                    </div>
+                    <h4>No Donations Found</h4>
+                    <p>Try adjusting your filters or make a new contribution.</p>
+                    <a href="{% url 'donations:donate_view' %}" class="btn-primary-hb mt-2" style="display: inline-flex;">Support Our Cause</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

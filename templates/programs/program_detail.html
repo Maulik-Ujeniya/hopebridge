@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ program.name }} — HopeBridge{% endblock %}
+
+{% block content %}
+<div style="padding-top: 120px; padding-bottom: 6rem;" class="container page-enter">
+    <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 2rem;">
+        <a href="{% url 'programs:program_list' %}" class="btn-outline-hb btn-sm">← Back to Programs</a>
+    </div>
+
+    <div class="grid grid-3" style="gap: 2rem; align-items: start;">
+        <!-- Left Panel: Program details -->
+        <div style="grid-column: span 2; display: flex; flex-direction: column; gap: 2rem;">
+            <div class="hb-card">
+                <span style="font-size: 0.8rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 0.5rem;">
+                    {{ program.category.name|upper }} PROGRAM
+                </span>
+                <h1 style="font-size: 2.2rem; margin-bottom: 1rem; font-family: var(--font-display);">{{ program.name }}</h1>
+                <p style="color: var(--gray-50); font-size: 0.8rem; background: var(--primary); padding: 0.25rem 0.75rem; border-radius: 50px; display: inline-block; margin-bottom: 2rem;">
+                    Status: {{ program.get_status_display }}
+                </p>
+
+                <h4 style="color: var(--primary); margin-bottom: 0.75rem;">Program Description</h4>
+                <p style="color: var(--gray-700); line-height: 1.8; margin-bottom: 2rem; font-size: 1.05rem;">
+                    {{ program.description }}
+                </p>
+
+                <!-- Impact Metrics -->
+                <div style="background: var(--gray-50); border-radius: var(--radius-md); padding: 1.5rem;">
+                    <h4 style="margin-bottom: 1rem;">Impact & Budget Tracking</h4>
+                    <div class="grid grid-3" style="gap: 1.5rem;">
+                        <div>
+                            <span style="font-size: 0.8rem; color: var(--gray-500);">Lives Impacted</span>
+                            <p style="font-size: 1.5rem; font-weight: 800; color: var(--accent); margin-top: 0.25rem;">{{ program.beneficiaries_count }}</p>
+                        </div>
+                        <div>
+                            <span style="font-size: 0.8rem; color: var(--gray-500);">Total Budget</span>
+                            <p style="font-size: 1.5rem; font-weight: 800; color: var(--gray-800); margin-top: 0.25rem;">₹{{ program.total_budget }}</p>
+                        </div>
+                        <div>
+                            <span style="font-size: 0.8rem; color: var(--gray-500);">Budget Spent</span>
+                            <p style="font-size: 1.5rem; font-weight: 800; color: var(--secondary); margin-top: 0.25rem;">₹{{ program.spent_budget }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Updates Timeline -->
+            <div class="hb-card">
+                <h3 style="margin-bottom: 1.5rem; font-family: var(--font-display);">📢 Program Updates</h3>
+                {% if updates %}
+                    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                        {% for update in updates %}
+                            <div style="border-left: 3px solid var(--accent); padding-left: 1.5rem; position: relative;">
+                                <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--accent); position: absolute; left: -8px; top: 6px;"></div>
+                                <h5 style="font-size: 1.1rem; margin-bottom: 0.25rem;">{{ update.title }}</h5>
+                                <p style="font-size: 0.8rem; color: var(--gray-400); margin-bottom: 0.5rem;">Posted on {{ update.posted_at|date:"d M Y" }}</p>
+                                <p style="color: var(--gray-600); font-size: 0.95rem; line-height: 1.6;">{{ update.update_text }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p style="color: var(--gray-400); font-style: italic;">No updates posted yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Right Panel: Managers & Sponsors -->
+        <div style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Manager info -->
+            <div class="hb-card">
+                <h4 style="margin-bottom: 1.5rem;">Program Manager</h4>
+                {% if program.program_manager %}
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <img src="{{ program.program_manager.profile_picture_url }}" alt="Profile" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover;">
+                        <div>
+                            <h5 style="font-size: 0.95rem; font-family: var(--font-display);">{{ program.program_manager.get_full_name }}</h5>
+                            <p style="font-size: 0.8rem; color: var(--gray-500);">Operations Manager</p>
+                        </div>
+                    </div>
+                {% else %}
+                    <p style="color: var(--gray-400); font-style: italic;">No manager assigned yet.</p>
+                {% endif %}
+            </div>
+
+            <!-- Sponsors list -->
+            <div class="hb-card">
+                <h4 style="margin-bottom: 1rem;">Program Sponsors ({{ sponsors.count }})</h4>
+                {% if sponsors %}
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        {% for sp in sponsors %}
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <img src="{{ sp.profile_picture_url }}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                                <span style="font-size: 0.9rem; font-weight: 500; color: var(--gray-800);">{{ sp.get_full_name }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p style="color: var(--gray-400); font-size: 0.85rem; font-style: italic;">Support this program! Make a donation to become a sponsor.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'volunteers/base_volunteer.html' %}
+{% load static %}
+
+{% block title %}Log Volunteer Hours — HopeBridge{% endblock %}
+
+{% block volunteer_content %}
+    <div class="hb-card">
+        <h2 style="margin-bottom: 0.5rem;">⏱️ Log Volunteer Hours</h2>
+        <p style="color: var(--gray-500); margin-bottom: 2rem;">Log your hours for the campaigns you are actively working on.</p>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="hb-form-group">
+                <label for="drive_id">Select Drive / Campaign *</label>
+                <select name="drive_id" id="drive_id" class="hb-form-control" required>
+                    <option value="">Choose Campaign</option>
+                    {% for assoc in assigned_drives %}
+                        <option value="{{ assoc.drive.id }}">{{ assoc.drive.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="hb-form-group">
+                    <label for="date">Date of Work *</label>
+                    <input type="date" name="date" id="date" value="{{ today }}" class="hb-form-control" max="{{ today }}" required>
+                </div>
+                <div class="hb-form-group">
+                    <label for="hours">Hours Contributed *</label>
+                    <input type="number" name="hours" id="hours" step="0.25" min="0.25" max="24" class="hb-form-control" placeholder="e.g. 3.5" required>
+                </div>
+            </div>
+
+            <div class="hb-form-group">
+                <label for="description">Work Done Description *</label>
+                <textarea name="description" id="description" class="hb-form-control" rows="4" placeholder="Briefly describe what tasks you performed..." required></textarea>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <a href="{% url 'volunteers:volunteer_dashboard' %}" class="btn-outline-hb">Cancel</a>
+                <button type="submit" class="btn-primary-hb">Submit Log</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

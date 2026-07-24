@@ -1,5 +1,25 @@
-venv/
-__pycache__/
+# Environment
+.env
 *.pyc
+__pycache__/
 db.sqlite3
+media/
+*.log
+
+# Virtual environment
+env/
+venv/
+.venv/
+
+# IDE
 .vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Static collection
+staticfiles/

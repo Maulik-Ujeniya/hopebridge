@@ -1,0 +1,57 @@
+{% extends 'volunteers/base_volunteer.html' %}
+{% load static %}
+
+{% block title %}My Profile — Volunteer Dashboard{% endblock %}
+
+{% block volunteer_content %}
+    <div style="margin-bottom: 2rem;">
+        <h2><i data-lucide="user" size="28" style="vertical-align: middle; color: var(--primary);"></i> Edit Profile</h2>
+    </div>
+
+    <div class="hb-card animate-on-scroll">
+        <form method="post" action="{% url 'volunteers:profile_update' %}">
+            {% csrf_token %}
+            
+            <div class="grid grid-2" style="gap: 1.5rem; margin-bottom: 1.5rem;">
+                <div class="form-group">
+                    <label for="availability">Availability</label>
+                    <select id="availability" name="availability" class="form-control" required style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: var(--radius-sm);">
+                        <option value="weekdays" {% if profile.availability == 'weekdays' %}selected{% endif %}>Weekdays</option>
+                        <option value="weekends" {% if profile.availability == 'weekends' %}selected{% endif %}>Weekends</option>
+                        <option value="both" {% if profile.availability == 'both' %}selected{% endif %}>Both</option>
+                        <option value="flexible" {% if profile.availability == 'flexible' %}selected{% endif %}>Flexible</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="languages">Languages Spoken</label>
+                    <input type="text" id="languages" name="languages" value="{{ profile.languages }}" placeholder="e.g. English, Spanish, Hindi" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: var(--radius-sm);">
+                    <small style="color: var(--gray-400); font-size: 0.8rem;">Comma-separated</small>
+                </div>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label for="interests">Interests & Causes</label>
+                <input type="text" id="interests" name="interests" value="{{ interests_str }}" placeholder="e.g. Teaching, Event Planning, Food Distribution" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: var(--radius-sm);">
+                <small style="color: var(--gray-400); font-size: 0.8rem;">Comma-separated</small>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label for="experience">Previous Experience</label>
+                <textarea id="experience" name="experience" rows="3" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: var(--radius-sm);">{{ profile.experience }}</textarea>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label for="motivation">Motivation</label>
+                <textarea id="motivation" name="motivation" rows="3" placeholder="Why do you want to volunteer with us?" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: var(--radius-sm);">{{ profile.motivation }}</textarea>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 2rem;">
+                <label for="emergency_contact">Emergency Contact</label>
+                <input type="text" id="emergency_contact" name="emergency_contact" value="{{ profile.emergency_contact }}" placeholder="Name & Phone Number" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: var(--radius-sm);">
+            </div>
+            
+            <button type="submit" class="btn-primary-hb">Save Profile</button>
+        </form>
+    </div>
+{% endblock %}

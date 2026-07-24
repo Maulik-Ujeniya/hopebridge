@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Our Work — HopeBridge{% endblock %}
+{% block content %}
+<div class="pt-page pb-page page-enter">
+    <div style="text-align: center; padding: 4rem 0 2rem;">
+        <h1>Our <span class="text-gradient">Work</span></h1>
+        <p style="color: var(--gray-500); max-width: 600px; margin: 1rem auto; font-size: 1.1rem;">
+            Explore the categories where HopeBridge is making a real difference.
+        </p>
+        <div style="margin-top: 1.5rem;">
+            <a href="{% url 'drives:drive_list' %}" class="btn-primary-hb">View Active Drives</a>
+        </div>
+    </div>
+    <div class="grid grid-3 stagger-children" style="padding-bottom: 4rem;">
+        {% for item in "123456789" %}
+        <div class="hb-card animate-on-scroll hover-lift" style="text-align: center;">
+            <span style="font-size: 3rem; display: block; margin-bottom: 1rem;">
+                {% if forloop.counter == 1 %}🏥{% elif forloop.counter == 2 %}📚{% elif forloop.counter == 3 %}🍲{% elif forloop.counter == 4 %}👕{% elif forloop.counter == 5 %}🏠{% elif forloop.counter == 6 %}👴{% elif forloop.counter == 7 %}🐾{% elif forloop.counter == 8 %}🌳{% else %}🏗️{% endif %}
+            </span>
+            <h4>{% if forloop.counter == 1 %}Health & Medical{% elif forloop.counter == 2 %}Education{% elif forloop.counter == 3 %}Food Donation{% elif forloop.counter == 4 %}Clothing Donation{% elif forloop.counter == 5 %}Orphanage (Anath Ashram){% elif forloop.counter == 6 %}Old-Age Home (Vridha Ashram){% elif forloop.counter == 7 %}Animal Rescue{% elif forloop.counter == 8 %}Environment{% else %}Infrastructure{% endif %}</h4>
+            <p style="color: var(--gray-500); font-size: 0.9rem; margin-top: 0.5rem;">Dedicated programs and drives creating lasting impact in this area.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

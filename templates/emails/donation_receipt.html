@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Thank You for Your Donation — HopeBridge</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f4f6f8; margin: 0; padding: 20px; color: #333333;">
+    <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 8px; border: 1px solid #e1e4e8; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+        <!-- Header Banner -->
+        <tr>
+            <td align="center" style="background-color: #6C63FF; padding: 40px 20px; color: #ffffff;">
+                <h1 style="margin: 0; font-size: 28px; font-weight: 800; letter-spacing: 0.5px;">HopeBridge</h1>
+                <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.85;">Building Bridges of Hope</p>
+            </td>
+        </tr>
+        <!-- Content Body -->
+        <tr>
+            <td style="padding: 40px 30px;">
+                <h2 style="margin-top: 0; color: #1F2937; font-size: 20px;">Dear {{ donation.name }},</h2>
+                <p style="font-size: 15px; line-height: 1.6; color: #4B5563;">
+                    Thank you so much for your generous donation of <strong>INR {{ donation.amount }}</strong> to HopeBridge NGO.
+                    Your contribution directly supports our daily drives for food, healthcare, and educational infrastructure.
+                </p>
+
+                <!-- Box Details -->
+                <div style="background-color: #f8f9fc; border-left: 4px solid #6C63FF; padding: 20px; margin: 30px 0; border-radius: 4px;">
+                    <h3 style="margin-top: 0; font-size: 14px; text-transform: uppercase; color: #6C63FF; letter-spacing: 0.5px;">Donation Summary</h3>
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size: 14px; line-height: 2;">
+                        <tr>
+                            <td width="40%" style="color: #6b7280;">Invoice Number:</td>
+                            <td width="60%" style="font-weight: 600; color: #1f2937;">{{ donation.invoice_number }}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #6b7280;">Donation Type:</td>
+                            <td style="font-weight: 600; color: #1f2937;">{{ donation.get_donation_type_display }}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #6b7280;">Transaction ID:</td>
+                            <td style="font-weight: 600; color: #1f2937; font-family: monospace;">{{ donation.transaction_id|default:"N/A" }}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #6b7280;">Payment Method:</td>
+                            <td style="font-weight: 600; color: #1f2937;">{{ donation.get_payment_method_display }}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #6b7280; font-weight: 700; padding-top: 10px; border-top: 1px solid #e5e7eb;">Amount Paid:</td>
+                            <td style="font-weight: 800; color: #6C63FF; font-size: 16px; padding-top: 10px; border-top: 1px solid #e5e7eb;">INR {{ donation.amount }}</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <p style="font-size: 14px; line-height: 1.6; color: #4B5563;">
+                    An official computer-generated receipt is attached to this email. You can also view or download your invoice at any time by logging into your profile dashboard on our platform.
+                </p>
+
+                <p style="font-size: 14px; line-height: 1.6; color: #4B5563; margin-top: 30px;">
+                    Warm regards,<br>
+                    <strong>The HopeBridge Team</strong>
+                </p>
+            </td>
+        </tr>
+        <!-- Footer -->
+        <tr>
+            <td align="center" style="background-color: #0F0E17; color: #9ba3b0; padding: 25px 20px; font-size: 12px; line-height: 1.5;">
+                <p style="margin: 0;">© 2026 HopeBridge NGO Portal. All rights reserved.</p>
+                <p style="margin: 5px 0 0 0;">Rajkot, Gujarat, India</p>
+                <p style="margin: 5px 0 0 0;"><a href="mailto:contact@hopebridge.org" style="color: #6C63FF; text-decoration: none;">contact@hopebridge.org</a></p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

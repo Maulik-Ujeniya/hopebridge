@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Donation Tracking — HopeBridge{% endblock %}
+
+{% block content %}
+<div style="background: var(--gray-50); min-height: calc(100vh - 70px); padding: 3rem 0;">
+    <div class="container" style="max-width: 1000px;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+            <a href="{% url 'donations:my_donations' %}" class="btn-outline-hb btn-sm" style="padding: 0.5rem 1rem;">← Back</a>
+            <h2 style="font-family: var(--font-display); margin: 0;">Donation Tracking: <span style="color: var(--primary);">{{ donation.invoice_number }}</span></h2>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; align-items: start;">
+            
+            <!-- Sidebar: Timeline -->
+            <div class="hb-card" style="padding: 2rem; position: sticky; top: 100px;">
+                <h4 style="color: var(--gray-900); margin-bottom: 1.5rem; font-family: var(--font-display);">Allocation Timeline</h4>
+                
+                <div style="position: relative; padding-left: 1.5rem; border-left: 2px solid var(--gray-200); margin-left: 0.5rem; display: flex; flex-direction: column; gap: 2rem;">
+                    
+                    <!-- Step 1 -->
+                    <div style="position: relative;">
+                        <div style="position: absolute; left: -2.1rem; top: 0; width: 1.25rem; height: 1.25rem; border-radius: 50%; background: var(--success); border: 3px solid var(--white); box-shadow: 0 0 0 1px var(--success);"></div>
+                        <h5 style="margin: 0; font-size: 0.95rem; color: var(--gray-900);">Payment Completed</h5>
+                        <p style="margin: 0.25rem 0 0 0; font-size: 0.8rem; color: var(--gray-500);">{{ donation.date_donated|date:"d M Y, h:i A" }}</p>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div style="position: relative;">
+                        <div style="position: absolute; left: -2.1rem; top: 0; width: 1.25rem; height: 1.25rem; border-radius: 50%; background: var(--success); border: 3px solid var(--white); box-shadow: 0 0 0 1px var(--success);"></div>
+                        <h5 style="margin: 0; font-size: 0.95rem; color: var(--gray-900);">Invoice Generated</h5>
+                        <p style="margin: 0.25rem 0 0 0; font-size: 0.8rem; color: var(--gray-500);">Sent to {{ donation.email }}</p>
+                        <a href="{% url 'invoices:view_invoice' donation.id %}" style="display: inline-block; margin-top: 0.5rem; font-size: 0.8rem; color: var(--primary); font-weight: 500;">View Invoice</a>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div style="position: relative;">
+                        <div style="position: absolute; left: -2.1rem; top: 0; width: 1.25rem; height: 1.25rem; border-radius: 50%; background: {% if has_allocations %}var(--success){% else %}var(--gray-300){% endif %}; border: 3px solid var(--white); box-shadow: 0 0 0 1px {% if has_allocations %}var(--success){% else %}var(--gray-300){% endif %};"></div>
+                        <h5 style="margin: 0; font-size: 0.95rem; color: {% if has_allocations %}var(--gray-900){% else %}var(--gray-500){% endif %};">Allocation Started</h5>
+                        {% if has_allocations %}
+                            <p style="margin: 0.25rem 0 0 0; font-size: 0.8rem; color: var(--success);">Funds assigned to drives</p>
+                        {% else %}
+                            <p style="margin: 0.25rem 0 0 0; font-size: 0.8rem; color: var(--gray-500);">Awaiting assignment</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div style="position: relative;">
+                        <div style="position: absolute; left: -2.1rem; top: 0; width: 1.25rem; height: 1.25rem; border-radius: 50%; background: {% if all_used %}var(--success){% else %}var(--gray-300){% endif %}; border: 3px solid var(--white); box-shadow: 0 0 0 1px {% if all_used %}var(--success){% else %}var(--gray-300){% endif %};"></div>
+                        <h5 style="margin: 0; font-size: 0.95rem; color: {% if all_used %}var(--gray-900){% else %}var(--gray-500){% endif %};">Allocation Completed</h5>
+                        {% if all_used %}
+                            <p style="margin: 0.25rem 0 0 0; font-size: 0.8rem; color: var(--success);">100% of funds utilized on ground</p>
+                        {% else %}
+                            <p style="margin: 0.25rem 0 0 0; font-size: 0.8rem; color: var(--gray-500);">Usage in progress</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Step 5 -->
+                    <div style="position: relative;">
+                        <div style="position: absolute; left: -2.1rem; top: 0; width: 1.25rem; height: 1.25rem; border-radius: 50%; background: var(--gray-300); border: 3px solid var(--white); box-shadow: 0 0 0 1px var(--gray-300);"></div>
+                        <h5 style="margin: 0; font-size: 0.95rem; color: var(--gray-500);">Impact Published</h5>
+                        <p style="margin: 0.25rem 0 0 0; font-size: 0.8rem; color: var(--gray-500);">Awaiting final report generation</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Main Content: Drive Allocations -->
+            <div>
+                <!-- Donation Overview Card -->
+                <div class="hb-card" style="margin-bottom: 2rem; padding: 1.5rem; background: linear-gradient(135deg, rgba(15,76,129,0.05) 0%, rgba(15,76,129,0.1) 100%);">
+                    <div class="grid grid-3">
+                        <div>
+                            <span style="font-size: 0.8rem; color: var(--gray-500); text-transform: uppercase; font-weight: 600;">Contributed</span>
+                            <p style="font-size: 1.5rem; font-weight: 800; color: var(--primary); margin: 0.25rem 0 0 0;">₹{{ donation.amount|intcomma }}</p>
+                        </div>
+                        <div>
+                            <span style="font-size: 0.8rem; color: var(--gray-500); text-transform: uppercase; font-weight: 600;">Category</span>
+                            <p style="font-size: 1.1rem; font-weight: 600; margin: 0.25rem 0 0 0; color: var(--gray-900);">{{ donation.get_donation_type_display }}</p>
+                        </div>
+                        <div>
+                            <span style="font-size: 0.8rem; color: var(--gray-500); text-transform: uppercase; font-weight: 600;">Status</span>
+                            <p style="font-size: 1.1rem; font-weight: 600; margin: 0.25rem 0 0 0; color: var(--success); display: flex; align-items: center; gap: 0.25rem;"><i data-lucide="check-circle" size="16"></i> Paid</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 0; margin-bottom: 1.5rem; font-family: var(--font-display);">📦 Where Your Contribution is Used</h3>
+
+                {% if allocations %}
+                    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                        {% for alloc in allocations %}
+                            <div class="hb-card" style="border-left: 4px solid var(--accent);">
+                                <div style="padding: 1.5rem;">
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1.5rem;">
+                                        <div>
+                                            <h4 style="color: var(--gray-900); font-size: 1.25rem; margin: 0 0 0.25rem 0;">{{ alloc.drive.title }}</h4>
+                                            <p style="font-size: 0.9rem; color: var(--gray-500); margin: 0;"><i data-lucide="map-pin" size="14" style="display: inline-block; vertical-align: middle;"></i> {{ alloc.drive.location_area|default:"N/A" }}, {{ alloc.drive.location_city }}</p>
+                                        </div>
+                                        <div style="text-align: right;">
+                                            <span style="font-size: 0.8rem; color: var(--gray-500); text-transform: uppercase; font-weight: 600;">Allocated</span>
+                                            <p style="font-size: 1.25rem; font-weight: 800; color: var(--accent); margin: 0;">₹{{ alloc.allocated_amount|intcomma }}</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Progress Bar -->
+                                    <div style="margin-bottom: 1.5rem;">
+                                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.5rem;">
+                                            <span style="font-weight: 500; color: var(--gray-700);">Utilization Progress</span>
+                                            <span style="font-weight: 600; color: var(--gray-900);">₹{{ alloc.used_amount|intcomma }} Used / ₹{{ alloc.allocated_amount|intcomma }} Total</span>
+                                        </div>
+                                        <div style="width: 100%; height: 8px; background: var(--gray-200); border-radius: 4px; overflow: hidden;">
+                                            <div style="height: 100%; background: var(--accent); width: {% widthratio alloc.used_amount alloc.allocated_amount 100 %}%;"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-3" style="gap: 1rem; background: var(--gray-50); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                                        <div>
+                                            <span style="font-size: 0.75rem; color: var(--gray-500); text-transform: uppercase;">Coordinator</span>
+                                            <p style="font-weight: 600; font-size: 0.9rem; margin: 0.25rem 0 0 0; color: var(--gray-900);">{{ alloc.drive.manager.get_full_name|default:"HopeBridge Admin" }}</p>
+                                        </div>
+                                        <div>
+                                            <span style="font-size: 0.75rem; color: var(--gray-500); text-transform: uppercase;">Volunteers</span>
+                                            <p style="font-weight: 600; font-size: 0.9rem; margin: 0.25rem 0 0 0; color: var(--gray-900);">{{ alloc.drive.drive_volunteers.count }} Active</p>
+                                        </div>
+                                        <div>
+                                            <span style="font-size: 0.75rem; color: var(--gray-500); text-transform: uppercase;">Est. Completion</span>
+                                            <p style="font-weight: 600; font-size: 0.9rem; margin: 0.25rem 0 0 0; color: var(--gray-900);">{{ alloc.drive.date|default:"TBD" }}</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Mock Actions -->
+                                    <div style="display: flex; gap: 1rem; border-top: 1px solid var(--gray-100); padding-top: 1rem;">
+                                        <button class="btn-outline-hb btn-sm" style="flex: 1; padding: 0.5rem; justify-content: center; font-size: 0.85rem; color: var(--gray-500);" disabled title="Photos will be available after completion">📸 View Photos</button>
+                                        <button class="btn-outline-hb btn-sm" style="flex: 1; padding: 0.5rem; justify-content: center; font-size: 0.85rem; color: var(--gray-500);" disabled title="Report generating...">📄 Impact Report</button>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="hb-card" style="text-align: center; padding: 4rem 2rem; color: var(--gray-500); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <i data-lucide="loader" size="48" style="color: var(--primary); margin-bottom: 1rem;" class="spin"></i>
+                        <h4 style="margin: 0 0 0.5rem 0; color: var(--gray-900); font-family: var(--font-display);">Allocation Pending</h4>
+                        <p style="font-size: 0.95rem; max-width: 400px; margin: 0; line-height: 1.5;">
+                            Thank you! A HopeBridge administrator is currently mapping your contribution to our most urgent active drives. Details will appear here shortly.
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

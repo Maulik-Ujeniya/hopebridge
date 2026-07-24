@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Donors — HopeBridge{% endblock %}
+
+{% block content %}
+<div style="padding-top: 120px; padding-bottom: 4rem; max-width: 1100px; margin: 0 auto; padding-left: 1.5rem; padding-right: 1.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
+        <div>
+            <h2>Donors</h2>
+            <p style="color: var(--gray-500);">Manage donor records.</p>
+        </div>
+        <a href="{% url 'donors:donor_create' %}" class="btn-primary-hb">Add Donor</a>
+    </div>
+
+    <div class="hb-card">
+        {% if donors %}
+            <div class="grid grid-2">
+                {% for donor in donors %}
+                    <div class="hb-card" style="padding: 1.25rem;">
+                        <h4 style="margin-bottom: 0.35rem;">{{ donor.name }}</h4>
+                        <p style="color: var(--gray-500); margin-bottom: 0.5rem;">{{ donor.email }}</p>
+                        <p style="margin-bottom: 1rem;">Total Donated: ₹{{ donor.total_donated }}</p>
+                        <a href="{% url 'donors:donor_detail' donor.id %}" class="btn-outline-hb btn-sm">View</a>
+                        <a href="{% url 'donors:donor_edit' donor.id %}" class="btn-secondary-hb btn-sm" style="margin-left: 0.5rem; color: var(--gray-700); border-color: rgba(15, 23, 42, 0.12);">Edit</a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p style="color: var(--gray-500);">No donor records yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

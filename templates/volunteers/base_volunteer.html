@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    .dashboard-layout {
+        display: grid;
+        grid-template-columns: 250px 1fr;
+        gap: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+    
+    .sidebar-nav {
+        background: var(--white);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        position: sticky;
+        top: 100px;
+        height: fit-content;
+    }
+    
+    .sidebar-link {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.75rem 1rem;
+        border-radius: var(--radius-md);
+        color: var(--gray-700);
+        font-weight: 500;
+        transition: all 0.2s;
+        margin-bottom: 0.5rem;
+        text-decoration: none;
+    }
+    
+    .sidebar-link:hover, .sidebar-link.active {
+        background: rgba(108, 99, 255, 0.1);
+        color: var(--primary);
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .status-pending { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+    .status-approved { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+    .status-rejected { background: rgba(239, 68, 68, 0.1); color: var(--error); }
+    
+    @media (max-width: 900px) {
+        .dashboard-layout {
+            grid-template-columns: 1fr;
+        }
+        .sidebar-nav {
+            position: relative;
+            top: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .sidebar-link {
+            margin-bottom: 0;
+            padding: 0.5rem 0.75rem;
+        }
+    }
+</style>
+{% block volunteer_css %}{% endblock %}
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout pt-page pb-page page-enter">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar-nav animate-on-scroll">
+        <div style="text-align: center; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--gray-200);">
+            <div style="width: 80px; height: 80px; border-radius: 50%; background: var(--gray-100); margin: 0 auto 1rem; overflow: hidden;">
+                <img src="{{ user.profile_picture_url }}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.25rem;">{{ user.get_full_name }}</h3>
+            <span class="status-badge status-{{ profile.status|lower }}">{{ profile.status|title }}</span>
+        </div>
+        
+        <nav>
+            <a href="{% url 'volunteers:volunteer_dashboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'volunteer_dashboard' %}active{% endif %}">
+                <i data-lucide="layout-dashboard" size="20"></i> Dashboard
+            </a>
+            <a href="{% url 'volunteers:profile_update' %}" class="sidebar-link {% if request.resolver_match.url_name == 'profile_update' %}active{% endif %}">
+                <i data-lucide="user" size="20"></i> My Profile
+            </a>
+            <a href="{% url 'volunteers:volunteer_history' %}" class="sidebar-link {% if request.resolver_match.url_name == 'volunteer_history' %}active{% endif %}">
+                <i data-lucide="history" size="20"></i> History & Logs
+            </a>
+            <a href="{% url 'volunteers:volunteer_calendar' %}" class="sidebar-link {% if request.resolver_match.url_name == 'volunteer_calendar' %}active{% endif %}">
+                <i data-lucide="calendar" size="20"></i> Schedule
+            </a>
+            <a href="{% url 'volunteers:volunteer_certificates' %}" class="sidebar-link {% if request.resolver_match.url_name == 'volunteer_certificates' %}active{% endif %}">
+                <i data-lucide="award" size="20"></i> Certificates
+            </a>
+        </nav>
+        
+        <div style="margin-top: 2rem; padding: 1rem; background: rgba(108, 99, 255, 0.05); border-radius: var(--radius-md);">
+            <h4 style="font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--primary);">Reward Points</h4>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <i data-lucide="star" style="color: var(--warning);" fill="currentColor"></i>
+                <span style="font-size: 1.5rem; font-weight: 700;">{{ profile.reward_points }}</span>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--gray-500); margin-top: 0.5rem;">Earn points by completing drives!</p>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="dashboard-content">
+        {% block volunteer_content %}{% endblock %}
+    </div>
+</div>
+{% endblock %}

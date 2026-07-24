@@ -1,0 +1,60 @@
+{% extends 'custom_admin/base_admin.html' %}
+
+{% block page_title %}{% if drive %}Edit Drive: {{ drive.title }}{% else %}Create New Drive{% endif %}{% endblock %}
+
+{% block content %}
+<a href="{% url 'custom_admin:drive_list' %}" style="display: inline-block; margin-bottom: 1.5rem; color: var(--gray-500); text-decoration: none; font-size: 0.9rem;">&larr; Back to Campaigns</a>
+
+<div class="admin-card" style="max-width: 800px;">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label for="title" style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Campaign Title</label>
+            <input type="text" id="title" name="title" value="{{ drive.title }}" required class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: 4px;">
+        </div>
+        
+        <div class="grid grid-2" style="gap: 1.5rem; margin-bottom: 1.5rem;">
+            <div class="form-group">
+                <label for="location_city" style="display: block; font-weight: 600; margin-bottom: 0.5rem;">City Location</label>
+                <input type="text" id="location_city" name="location_city" value="{{ drive.location_city }}" required class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: 4px;">
+            </div>
+            <div class="form-group">
+                <label for="start_date" style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Start Date</label>
+                <input type="date" id="start_date" name="start_date" value="{{ drive.start_date|date:'Y-m-d' }}" required class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: 4px;">
+            </div>
+        </div>
+        
+        <div class="grid grid-2" style="gap: 1.5rem; margin-bottom: 1.5rem;">
+            <div class="form-group">
+                <label for="status" style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Status</label>
+                <select id="status" name="status" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: 4px;">
+                    <option value="planning" {% if drive.status == 'planning' %}selected{% endif %}>Planning</option>
+                    <option value="active" {% if drive.status == 'active' %}selected{% endif %}>Active</option>
+                    <option value="completed" {% if drive.status == 'completed' %}selected{% endif %}>Completed</option>
+                    <option value="cancelled" {% if drive.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="budget_allocated" style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Allocated Budget (₹)</label>
+                <input type="number" step="0.01" id="budget_allocated" name="budget_allocated" value="{{ drive.budget_allocated|default:'0.00' }}" required class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: 4px;">
+            </div>
+        </div>
+        
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label for="description" style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Description & Goals</label>
+            <textarea id="description" name="description" rows="5" required class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: 4px;">{{ drive.description }}</textarea>
+        </div>
+        
+        <div class="form-group" style="margin-bottom: 2rem;">
+            <label for="cover_image" style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Cover Image</label>
+            <input type="file" id="cover_image" name="cover_image" accept="image/*" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: 4px; background: var(--gray-50);">
+            {% if drive.cover_image %}
+                <p style="font-size: 0.8rem; color: var(--gray-500); margin-top: 0.5rem;">Current: <a href="{{ drive.cover_image.url }}" target="_blank">View Image</a></p>
+            {% endif %}
+        </div>
+        
+        <button type="submit" class="btn-primary-hb">{% if drive %}Update Drive{% else %}Create Drive{% endif %}</button>
+    </form>
+</div>
+{% endblock %}

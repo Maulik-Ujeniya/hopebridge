@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment Failed — HopeBridge{% endblock %}
+
+{% block content %}
+<div style="padding-top: 140px; padding-bottom: 6rem; max-width: 550px; margin: 0 auto; padding-left: 1.5rem; padding-right: 1.5rem;">
+    <div class="hb-card page-enter" style="text-align: center; border-top: 5px solid var(--danger);">
+        <span style="font-size: 4rem; display: block; margin-bottom: 1rem; color: var(--danger);">❌</span>
+        <h2 style="margin-bottom: 0.5rem; color: var(--danger);">Payment Failed</h2>
+        <p style="color: var(--gray-600); line-height: 1.7; margin-bottom: 2rem;">
+            We could not process your transaction. This might be due to incorrect details or bank connectivity issues.
+        </p>
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+            <a href="{% url 'donations:donate_view' %}" class="btn-primary-hb">Try Again Securely</a>
+            <a href="{% url 'home' %}" class="btn-outline-hb">Back to Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

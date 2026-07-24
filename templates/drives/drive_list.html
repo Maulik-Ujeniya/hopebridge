@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}NGO Drives & Campaigns — HopeBridge{% endblock %}
+
+{% block content %}
+<div style="padding-top: 120px; padding-bottom: 4rem;" class="container page-enter">
+    <div style="text-align: center; margin-bottom: 3rem;">
+        <h1>🚗 Our Active <span class="text-gradient">Drives & Campaigns</span></h1>
+        <p style="color: var(--gray-500); max-width: 600px; margin: 0.5rem auto; font-size: 1.1rem;">
+            Explore our real-time campaigns. Join as a volunteer to make hands-on contributions or track ongoing progress.
+        </p>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="hb-card" style="margin-bottom: 3rem; padding: 1.5rem;">
+        <form method="GET" action="{% url 'drives:drive_list' %}" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+            <div style="flex: 2; min-width: 200px;">
+                <input type="text" name="q" value="{{ query }}" class="hb-form-control" placeholder="Search drives..." style="padding: 0.6rem 1rem;">
+            </div>
+            <div style="flex: 1; min-width: 150px;">
+                <select name="category" class="hb-form-control" style="padding: 0.6rem 1rem;">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat.id }}" {% if selected_category == cat.id|stringformat:'s' %}selected{% endif %}>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div style="flex: 1; min-width: 150px;">
+                <select name="city" class="hb-form-control" style="padding: 0.6rem 1rem;">
+                    <option value="">All Cities</option>
+                    {% for c in cities %}
+                        <option value="{{ c }}" {% if selected_city == c %}selected{% endif %}>{{ c }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn-primary-hb" style="padding: 0.6rem 1.5rem;">Filter</button>
+            <a href="{% url 'drives:drive_list' %}" class="btn-outline-hb" style="padding: 0.6rem 1.5rem;">Clear</a>
+        </form>
+    </div>
+
+    <!-- Drives Grid -->
+    {% if drives %}
+        <div class="grid grid-3 stagger-children">
+            {% for drive in drives %}
+                <div class="hb-card hover-lift" style="display: flex; flex-direction: column; justify-content: space-between; padding: 1.5rem; overflow: hidden; position: relative;">
+                    <div>
+                        <!-- Category Badge -->
+                        <span style="font-size: 0.75rem; font-weight: 700; color: {{ drive.category.color }}; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 0.5rem;">
+                            {{ drive.category.name|upper }}
+                        </span>
+                        <h3 style="font-size: 1.3rem; margin-bottom: 0.75rem;">{{ drive.title }}</h3>
+                        <p style="color: var(--gray-600); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.5rem;">
+                            {{ drive.description|truncatewords:20 }}
+                        </p>
+                    </div>
+
+                    <div>
+                        <!-- Progress Bar -->
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.25rem;">
+                                <span style="color: var(--gray-500);">Impact Progress:</span>
+                                <span style="font-weight: 700; color: var(--primary);">{{ drive.progress_percentage }}%</span>
+                            </div>
+                            <div class="hb-progress">
+                                <div class="hb-progress-bar" style="width: {{ drive.progress_percentage }}%;"></div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--gray-400); margin-top: 0.25rem;">
+                                <span>Target: {{ drive.target_beneficiaries }} lives</span>
+                                <span>Reached: {{ drive.actual_beneficiaries }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Location & Date -->
+                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--gray-500); margin-bottom: 1.5rem;">
+                            <span>📍 {{ drive.location_city }}</span>
+                            <span>🗓️ Ends: {{ drive.end_date|default:"Ongoing" }}</span>
+                        </div>
+
+                        <!-- Action Button -->
+                        <a href="{% url 'drives:drive_detail' drive.id %}" class="btn-primary-hb btn-sm" style="width: 100%; justify-content: center;">
+                            View Campaign details →
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="hb-card" style="text-align: center; padding: 4rem 2rem; color: var(--gray-400);">
+            <span style="font-size: 3rem; display: block; margin-bottom: 1rem;">🔍</span>
+            <h4 style="color: var(--gray-800); margin-bottom: 0.5rem;">No Drives Found</h4>
+            <p style="font-size: 0.95rem; max-width: 500px; margin: 0 auto 1.5rem;">
+                We couldn't find any drives matching your filters. Try clearing your filters or exploring general active drives.
+            </p>
+            <a href="{% url 'drives:drive_list' %}" class="btn-primary-hb">View All Drives</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

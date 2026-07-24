@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Events & Fundraisers — HopeBridge{% endblock %}
+
+{% block content %}
+<div style="padding-top: 120px; padding-bottom: 4rem;" class="container page-enter">
+    <div style="text-align: center; margin-bottom: 3rem;">
+        <h1>🎪 NGO <span class="text-gradient">Events & Activities</span></h1>
+        <p style="color: var(--gray-500); max-width: 600px; margin: 0.5rem auto; font-size: 1.1rem;">
+            Join our upcoming educational programs, fundraising campaigns, and community awareness activities.
+        </p>
+    </div>
+
+    <!-- Events Grid -->
+    {% if events %}
+        <div class="grid grid-3 stagger-children">
+            {% for event in events %}
+                <div class="hb-card hover-lift" style="display: flex; flex-direction: column; justify-content: space-between; padding: 1.5rem;">
+                    <div>
+                        <!-- Event Type Badge -->
+                        <span style="font-size: 0.75rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 0.5rem;">
+                            {{ event.get_event_type_display }}
+                        </span>
+                        <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">{{ event.name }}</h3>
+                        <p style="color: var(--gray-600); font-size: 0.85rem; line-height: 1.5; margin-bottom: 1.5rem;">
+                            {{ event.description|truncatewords:15 }}
+                        </p>
+                    </div>
+
+                    <div>
+                        <!-- Date, Location, Status -->
+                        <div style="border-top: 1px solid var(--gray-100); padding-top: 1rem; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.8rem; color: var(--gray-500);">
+                            <span>📅 Date: {{ event.date|date:"d M Y" }}</span>
+                            <span>📍 Location: {{ event.location }}, {{ event.city }}</span>
+                            {% if event.date >= today %}
+                                <span style="color: var(--success); font-weight: 600;">Status: Upcoming</span>
+                            {% else %}
+                                <span style="color: var(--gray-400);">Status: Passed</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Action Button -->
+                        <a href="{% url 'events:event_detail' event.id %}" class="btn-primary-hb btn-sm" style="width: 100%; justify-content: center;">
+                            Details & Register →
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="hb-card" style="text-align: center; padding: 4rem 2rem; color: var(--gray-400);">
+            <span style="font-size: 3rem; display: block; margin-bottom: 1rem;">🔍</span>
+            <h4 style="color: var(--gray-800); margin-bottom: 0.5rem;">No Events Scheduled</h4>
+            <p style="font-size: 0.95rem; max-width: 500px; margin: 0 auto 1.5rem;">
+                We don't have any events scheduled at the moment. Check back soon or visit our homepage for updates.
+            </p>
+            <a href="{% url 'home' %}" class="btn-primary-hb">Back to Home</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
